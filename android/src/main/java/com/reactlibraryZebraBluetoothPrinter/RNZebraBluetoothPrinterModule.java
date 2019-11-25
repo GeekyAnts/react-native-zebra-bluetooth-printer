@@ -19,4 +19,10 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule {
   public String getName() {
     return "RNZebraBluetoothPrinter";
   }
+  
+  @ReactMethod
+  public void show(String text) {
+    Context context = getReactApplicationContext();
+    Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+  }
 }
