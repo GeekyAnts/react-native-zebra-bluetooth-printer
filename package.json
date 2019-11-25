@@ -1,4 +1,3 @@
-
 {
   "name": "react-native-zebra-bluetooth-printer",
   "version": "1.0.0",
@@ -12,6 +11,9 @@
   ],
   "author": "",
   "license": "",
+  "devDependencies": {
+    "react-native": "^0.41.2"
+  },
   "peerDependencies": {
     "react-native": "^0.41.2"
   }
