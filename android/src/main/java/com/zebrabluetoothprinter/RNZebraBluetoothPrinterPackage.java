@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package com.zebrabluetoothprinter;
 
 import java.util.Arrays;
 import java.util.Collections;

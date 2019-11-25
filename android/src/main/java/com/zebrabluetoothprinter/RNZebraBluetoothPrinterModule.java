@@ -1,11 +1,11 @@
 
-package com.reactlibrary;
+package com.zebrabluetoothprinter;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
-
+import android.widget.Toast;
 public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
@@ -22,7 +22,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule {
   
   @ReactMethod
   public void show(String text) {
-    Context context = getReactApplicationContext();
-    Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+    // Context context = getReactApplicationContext();
+    Toast.makeText(getReactApplicationContext(), text, Toast.LENGTH_LONG).show();
   }
 }
