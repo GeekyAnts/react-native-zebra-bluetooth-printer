@@ -50,9 +50,12 @@ const App: () => React$Node = () => {
           <View style={styles.body}>
             <TouchableOpacity 
             onPress={()=>{
-
+              NativeModules.RNZebraBluetoothPrinter.disableBluetooth().then(res=>{
+                NativeModules.RNZebraBluetoothPrinter.show("res");
+              });
             }}
             ><Text>
+              Press to Disable
               </Text></TouchableOpacity>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>

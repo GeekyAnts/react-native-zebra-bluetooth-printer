@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.bluetooth.le.ScanCallback;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
@@ -20,6 +21,8 @@ import com.facebook.react.bridge.*;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
@@ -70,10 +73,8 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule {
   }
   @ReactMethod
   public void isEnabledBluetooth(final Promise promise) {
-    // Ensures Bluetooth is available on the device and it is enabled. If not,
-    // displays a dialog requesting user permission to enable Bluetooth.
+    
     if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-     
       // Activity a = (Activity) getContext();
       // startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),1);
       Toast.makeText(getReactApplicationContext(), "Disabled", Toast.LENGTH_LONG).show();
@@ -85,8 +86,29 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule {
       promise.resolve(true);
     }
   }
-  // @Reactmethod 
-  // public void scanDevices() {
-
+  // @ReactMethod 
+  // public void scanDevices(final Promise promise) {
+  //   if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+  //     promise.reject("BT NOT ENABLED");
+  //   } else {
+  //     handler.postDelayed(new Runnable(){
+  //       @Override 
+  //       public void run() {
+  //        bluetoothAdapter.stopLeScan(leScanCallback);
+  //       }
+  //     }, SCAN_PERIOD);
+  //     bluetoothAdapter.startLeScan(leScanCallback);
+  //     promise.resolve("FOUND");
+  //   }
   // }
+  @ReactMethod
+  public void disableBluetooth(final Promise promise) {
+    if( bluetoothAdapter == null ) {
+      promise.resolve(true);
+    }
+    else {
+      bluetoothAdapter.disable();
+      promise.resolve(true);
+    }
+  }
 }
