@@ -30,7 +30,7 @@ import {
 // import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
 
 const App: () => React$Node = () => {
-  NativeModules.RNZebraBluetoothPrinter.show('Helo world!');
+
   NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
     console.log(res);
   });

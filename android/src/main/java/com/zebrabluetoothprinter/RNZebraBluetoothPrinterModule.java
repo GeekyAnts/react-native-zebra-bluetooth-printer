@@ -64,16 +64,24 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule {
     Toast.makeText(getReactApplicationContext(), text, Toast.LENGTH_LONG).show();
   }
   @ReactMethod
+  public void enableBluetooth() {
+    
+   this.reactContext.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),1,null);
+  }
+  @ReactMethod
   public void isEnabledBluetooth(final Promise promise) {
     // Ensures Bluetooth is available on the device and it is enabled. If not,
     // displays a dialog requesting user permission to enable Bluetooth.
     if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-      Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+     
       // Activity a = (Activity) getContext();
-      // a.startActivityForResult(enableBtIntent, BT_ENABLED_REQUEST);
+      // startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),1);
+      Toast.makeText(getReactApplicationContext(), "Disabled", Toast.LENGTH_LONG).show();
+      this.enableBluetooth();
       promise.resolve(false);
     }
     else {
+         Toast.makeText(getReactApplicationContext(), "Enabled", Toast.LENGTH_LONG).show();
       promise.resolve(true);
     }
   }
