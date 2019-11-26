@@ -31,6 +31,9 @@ import {
 
 const App: () => React$Node = () => {
   NativeModules.RNZebraBluetoothPrinter.show('Helo world!');
+  NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
+    console.log(res);
+  });
   return (
     <>
       <StatusBar barStyle="dark-content" />
