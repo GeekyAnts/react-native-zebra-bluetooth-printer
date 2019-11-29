@@ -15,7 +15,8 @@ import {
   Text,
   StatusBar,
   TouchableOpacity,
-  NativeModules
+  NativeModules,
+  Alert
 } from 'react-native';
 
 import {
@@ -56,6 +57,24 @@ const App: () => React$Node = () => {
             }}
             ><Text>
               Press to Disable
+              </Text></TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
+                console.log(res);
+                });
+              }}
+            ><Text>
+                Get paired Devices
+              </Text></TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                NativeModules.RNZebraBluetoothPrinter.scanDevices().then(res => {
+                  Alert.alert(res);
+                });
+              }}
+            ><Text>
+                Get unpaired Devices
               </Text></TouchableOpacity>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>
