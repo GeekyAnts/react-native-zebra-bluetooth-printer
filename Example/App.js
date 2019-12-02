@@ -31,10 +31,10 @@ import {
 // import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
 
 const App: () => React$Node = () => {
-
-  NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
-    console.log(res);
-  });
+  console.log(NativeModules);
+  // NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
+  //   console.log(res);
+  // });
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -75,6 +75,15 @@ const App: () => React$Node = () => {
               }}
             ><Text>
                 Get unpaired Devices
+              </Text></TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                NativeModules.RNZebraBluetoothPrinter.connectDevice("38:F9:D3:AB:72:3E").then(res => {
+                  Alert.alert(res);
+                });
+              }}
+            ><Text>
+               connect to printer
               </Text></TouchableOpacity>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>

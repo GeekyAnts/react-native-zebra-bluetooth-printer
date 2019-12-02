@@ -35,7 +35,7 @@ target 'Example' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
 
-  pod 'RNZebraBluetoothPrinter', :path => '../node_modules/react-native-zebra-bluetooth-printer'
+  pod 'RNZebraBluetoothPrinter', :path => '../node_modules/react-native-zebra-bluetooth-printer/ios/RNZebraBluetoothPrinter.podspec'
 
   target 'ExampleTests' do
     inherit! :search_paths

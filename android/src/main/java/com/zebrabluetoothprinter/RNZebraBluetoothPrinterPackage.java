@@ -13,7 +13,8 @@ import com.facebook.react.bridge.JavaScriptModule;
 public class RNZebraBluetoothPrinterPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-      return Arrays.<NativeModule>asList(new RNZebraBluetoothPrinterModule(reactContext));
+        BluetoothService service = new BluetoothService(reactContext);
+      return Arrays.<NativeModule>asList(new RNZebraBluetoothPrinterModule(reactContext,service));
     }
 
     // Deprecated from RN 0.47
