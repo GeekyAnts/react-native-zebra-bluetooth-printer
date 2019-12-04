@@ -70,7 +70,7 @@ const App: () => React$Node = () => {
             <TouchableOpacity
               onPress={() => {
                 NativeModules.RNZebraBluetoothPrinter.scanDevices().then(res => {
-                  Alert.alert(res);
+                  console.log(res);
                 });
               }}
             ><Text>

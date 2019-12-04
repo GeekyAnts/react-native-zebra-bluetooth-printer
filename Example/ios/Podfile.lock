@@ -249,7 +249,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RNZebraBluetoothPrinter (from `../node_modules/react-native-zebra-bluetooth-printer/ios/RNZebraBluetoothPrinter.podspec`)
+  - RNZebraBluetoothPrinter (from `../node_modules/react-native-zebra-bluetooth-printer/ios`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -306,7 +306,7 @@ EXTERNAL SOURCES:
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
   RNZebraBluetoothPrinter:
-    :path: "../node_modules/react-native-zebra-bluetooth-printer/ios/RNZebraBluetoothPrinter.podspec"
+    :path: "../node_modules/react-native-zebra-bluetooth-printer/ios"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -339,6 +339,6 @@ SPEC CHECKSUMS:
   RNZebraBluetoothPrinter: db8bddc45487be5cfdb28b4606de31e932426c3e
   Yoga: ba3d99dbee6c15ea6bbe3783d1f0cb1ffb79af0f
 
-PODFILE CHECKSUM: 16bcea66f1f00b395b7b99d48b76681b9b56ba2e
+PODFILE CHECKSUM: 45dc2134d5329018d818e2e2478854f19039a12b
 
 COCOAPODS: 1.7.3
