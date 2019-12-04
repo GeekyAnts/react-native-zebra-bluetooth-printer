@@ -37,7 +37,8 @@ import java.util.Set;
 import android.os.Handler;
 import java.util.ArrayList;
 import java.util.List;
-
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 // import com.zebra.sdk.comm.BluetoothConnection;
 // import com.zebra.sdk.comm.Connection;
 // import com.zebra.sdk.printer.PrinterStatus;
@@ -74,11 +75,12 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public static final String EVENT_UNABLE_CONNECT = "EVENT_UNABLE_CONNECT";
   public static final String EVENT_CONNECTED = "EVENT_CONNECTED";
   public static final String EVENT_BLUETOOTH_NOT_SUPPORT = "EVENT_BLUETOOTH_NOT_SUPPORT";
-
+  private static final String PROMISE_SCAN = "SCAN";
   // Intent request codes
   private static final int REQUEST_CONNECT_DEVICE = 1;
   private static final int REQUEST_ENABLE_BT = 2;
-
+  private JSONArray pairedDeivce = new JSONArray();
+  private JSONArray foundDevice = new JSONArray();
   public static final int MESSAGE_STATE_CHANGE = BluetoothService.MESSAGE_STATE_CHANGE;
   public static final int MESSAGE_READ = BluetoothService.MESSAGE_READ;
   public static final int MESSAGE_WRITE = BluetoothService.MESSAGE_WRITE;
@@ -113,6 +115,21 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     this.getBluetoothManagerInstance(context);
     this.mService = bluetoothService;
     this.mService.addStateObserver(this);
+    IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+    filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+    this.reactContext.registerReceiver(discoverReceiver, filter);
+  }
+
+  private void cancelDiscovery() {
+    try {
+      BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
+      if (adapter != null && adapter.isDiscovering()) {
+        adapter.cancelDiscovery();
+      }
+      Log.d(TAG, "Discover canceled");
+    } catch (Exception e) {
+      // ignore
+    }
   }
 
   @Override
@@ -151,13 +168,28 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
       promise.reject("BT NOT ENABLED");
     } else {
-      handler.postDelayed(new Runnable(){
-        @Override 
-        public void run() {
-         bluetoothAdapter.stopLeScan(leScanCallback);
-        }
-      }, 10000);
-      bluetoothAdapter.startLeScan(leScanCallback);
+      cancelDiscovery();
+      // handler.postDelayed(new Runnable(){
+      //   @Override 
+      //   public void run() {
+      //    bluetoothAdapter.stopLeScan(leScanCallback);
+      //   }
+      // }, 10000);
+      // bluetoothAdapter.startLeScan(leScanCallback);
+      int permissionChecked = ContextCompat.checkSelfPermission(reactContext,
+          android.Manifest.permission.ACCESS_COARSE_LOCATION);
+      if (permissionChecked == PackageManager.PERMISSION_DENIED) {
+    
+        ActivityCompat.requestPermissions(reactContext.getCurrentActivity(),
+            new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, 1);
+      }
+      if (!bluetoothAdapter.startDiscovery()) {
+        promise.reject("DISCOVER", "NOT_STARTED");
+        cancelDiscovery();
+      } else {
+        promiseMap.put(PROMISE_SCAN, promise);
+      }
+
       // promise.resolve(LeDeviceListAdapter.mLeDevices);
     }
   }
@@ -266,6 +298,72 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
      
     }
   }
+  
+  private final BroadcastReceiver discoverReceiver = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      String action = intent.getAction();
+      Log.d(TAG, "on receive:" + action);
+      // When discovery finds a device
+      if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+        // Get the BluetoothDevice object from the Intent
+        BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+          JSONObject deviceFound = new JSONObject();
+          try {
+            deviceFound.put("name", device.getName());
+            deviceFound.put("address", device.getAddress());
+          } catch (Exception e) {
+            // ignore
+          }
+          if (!objectFound(deviceFound)) {
+            foundDevice.put(deviceFound);
+            WritableMap params = Arguments.createMap();
+            params.putString("device", deviceFound.toString());
+            reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(EVENT_DEVICE_FOUND,
+                params);
+          }
+
+        }
+      } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+        Promise promise = promiseMap.remove(PROMISE_SCAN);
+        if (promise != null) {
+
+          JSONObject result = null;
+          try {
+            result = new JSONObject();
+            result.put("paired", pairedDeivce);
+            result.put("found", foundDevice);
+            promise.resolve(result.toString());
+          } catch (Exception e) {
+            // ignore
+          }
+          WritableMap params = Arguments.createMap();
+          params.putString("paired", pairedDeivce.toString());
+          params.putString("found", foundDevice.toString());
+          emitRNEvent(EVENT_DEVICE_DISCOVER_DONE, params);
+        }
+      }
+    }
+  };
+
+  private boolean objectFound(JSONObject obj) {
+    boolean found = false;
+    if (foundDevice.length() > 0) {
+      for (int i = 0; i < foundDevice.length(); i++) {
+        try {
+          String objAddress = obj.optString("address", "objAddress");
+          String dsAddress = ((JSONObject) foundDevice.get(i)).optString("address", "dsAddress");
+          if (objAddress.equalsIgnoreCase(dsAddress)) {
+            found = true;
+            break;
+          }
+        } catch (Exception e) {
+        }
+      }
+    }
+    return found;
+  }
   @ReactMethod
   public void connectDevice(String address,final Promise promise) {
     BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
@@ -277,10 +375,72 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       promise.reject("BT NOT ENABLED");
     }
   }
-  @ReactMethod
-  public void print() {
-    
+  
+  public static void sleep(int ms) {
+    try {
+      Thread.sleep(ms);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
+
+  // public void disconnect() {
+  //   try {
+  //     if (connection != null) {
+  //       connection.close();
+  //     }
+
+  //   } catch (ConnectionException e) {
+  //     Log.d("Error on disconnect", e.toString());
+  //   }
+  // }
+  // @ReactMethod
+  // public void print(String device, String label, Boolean setTemplate, Callback errorCallback,
+  //     Callback successCallback) {
+  //   boolean success = false;
+  //   boolean loading = false;
+  //   sleep(500);
+  //   connection = new BluetoothConnection(device);
+  //   try {
+  //     loading = true;
+  //     connection.open();
+  //   } catch (ConnectionException e) {
+  //     disconnect();
+  //     Log.d("Connection err", e.toString());
+  //     loading = false;
+  //     success = false;
+  //     errorCallback.invoke("Unable to establish connection.Please try again!");
+  //   }
+  //   if (connection.isConnected()) {
+  //     try {
+  //       Log.d("Connection estd", "here");
+
+  //       ZebraPrinter zebraPrinter = ZebraPrinterFactory.getInstance(connection);
+  //       PrinterStatus status = zebraPrinter.getCurrentStatus();
+
+  //       String pl = SGD.GET("device.languages", connection);
+
+  //       byte[] configLabel = getConfigLabel(zebraPrinter, label, setTemplate);
+  //       connection.write(configLabel);
+  //       sleep(1500);
+  //       success = true;
+  //       loading = false;
+  //       successCallback.invoke(loading, success);
+
+  //     } catch (Exception err) {
+  //       success = false;
+  //       loading = false;
+  //       Log.d("Connection err", err.toString());
+  //       errorCallback.invoke(err.toString());
+  //       // disconnect();
+  //       // promise.reject(E_LAYOUT_ERROR, err);
+
+  //     } finally {
+  //       disconnect();
+  //     }
+  //   }
+
+  // }
   @Override
     public void onBluetoothServiceStateChanged(int state, Map<String, Object> bundle) {
         Log.d(TAG,"on bluetoothServiceStatChange:"+state);

@@ -24,6 +24,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNZebraBluetoothPrinter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNZebraBluetoothPrinter.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79C3EE1F23968ADA00A908A0 /* zebra-bluetooth-printer */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "zebra-bluetooth-printer"; path = ..; sourceTree = "<group>"; };
+		79C3EE212396900100A908A0 /* ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ios; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNZebraBluetoothPrinter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNZebraBluetoothPrinter.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNZebraBluetoothPrinter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNZebraBluetoothPrinter.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,10 +52,20 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				79C3EE212396900100A908A0 /* ios */,
 				B3E7B5881CC2AC0600A0062D /* RNZebraBluetoothPrinter.h */,
 				B3E7B5891CC2AC0600A0062D /* RNZebraBluetoothPrinter.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				79C3EE1E23968ADA00A908A0 /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		79C3EE1E23968ADA00A908A0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				79C3EE1F23968ADA00A908A0 /* zebra-bluetooth-printer */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,6 +107,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 58B511D21A9E6C8500147676;
@@ -204,7 +217,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
-				"$(inherited)",
+					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../React/**",
 					"$(SRCROOT)/../../react-native/React/**",
