@@ -29,7 +29,7 @@ import {
 
 // import {Button} from 'react-native-elements';
 // import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
-
+const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS^ XZ";
 const App: () => React$Node = () => {
   console.log(NativeModules);
   // NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
@@ -52,7 +52,7 @@ const App: () => React$Node = () => {
             <TouchableOpacity 
             onPress={()=>{
               NativeModules.RNZebraBluetoothPrinter.disableBluetooth().then(res=>{
-                NativeModules.RNZebraBluetoothPrinter.show("res");
+              console.log(res);
               });
             }}
             ><Text>
@@ -78,12 +78,21 @@ const App: () => React$Node = () => {
               </Text></TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                NativeModules.RNZebraBluetoothPrinter.connectDevice("38:F9:D3:AB:72:3E").then(res => {
+                NativeModules.RNZebraBluetoothPrinter.connectDevice("AC:3F:A4:AF:36:17").then(res => {
                   Alert.alert(res);
                 });
               }}
             ><Text>
                connect to printer
+              </Text></TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                NativeModules.RNZebraBluetoothPrinter.print("AC:3F:A4:AF:36:17",zpl,true).then(res => {
+                 console.log(res);
+                });
+              }}
+            ><Text>
+               Print Zpl
               </Text></TouchableOpacity>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>
