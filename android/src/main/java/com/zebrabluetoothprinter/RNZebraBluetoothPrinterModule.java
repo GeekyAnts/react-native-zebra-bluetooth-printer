@@ -34,12 +34,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import android.os.Handler;
 import java.util.ArrayList;
 import java.util.List;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import com.zebra.sdk.comm.BluetoothConnection;
+import com.zebra.sdk.comm.BluetoothConnection;                                  // using zebra sdk for print functionality
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.printer.PrinterStatus;
 import com.zebra.sdk.comm.ConnectionException;
@@ -54,14 +53,11 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   private final ReactApplicationContext reactContext;
   private BluetoothAdapter bluetoothAdapter;
   private static final String TAG = "BluetoothManager";
-  // private LeDeviceListAdapter leDeviceListAdapter;
   public BluetoothManager bluetoothManager;
   private boolean mScanning;
   public static Context context;
-  private static final String PROMISE_CONNECT = "CONNECT";
-  private static final String PROMISE_ENABLE_BT = "ENABLE_BT";
+ 
   public static String EXTRA_DEVICE_ADDRESS = "device_address";
-  private Handler handler;
   private String mConnectedDeviceName = null;
   private static final Map<String, Promise> promiseMap = Collections.synchronizedMap(new HashMap<String, Promise>());
   private BluetoothService mService = null;
@@ -77,6 +73,10 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public static final String EVENT_CONNECTED = "EVENT_CONNECTED";
   public static final String EVENT_BLUETOOTH_NOT_SUPPORT = "EVENT_BLUETOOTH_NOT_SUPPORT";
   private static final String PROMISE_SCAN = "SCAN";
+  private static final String PROMISE_CONNECT = "CONNECT";
+  private static final String PROMISE_ENABLE_BT = "ENABLE_BT";
+  public static final String DEVICE_NAME = BluetoothService.DEVICE_NAME;
+  public static final String TOAST = BluetoothService.TOAST;
   // Intent request codes
   private static final int REQUEST_CONNECT_DEVICE = 1;
   private static final int REQUEST_ENABLE_BT = 2;
@@ -86,30 +86,16 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public static final int MESSAGE_READ = BluetoothService.MESSAGE_READ;
   public static final int MESSAGE_WRITE = BluetoothService.MESSAGE_WRITE;
   public static final int MESSAGE_DEVICE_NAME = BluetoothService.MESSAGE_DEVICE_NAME;
-
   public static final int MESSAGE_CONNECTION_LOST = BluetoothService.MESSAGE_CONNECTION_LOST;
   public static final int MESSAGE_UNABLE_CONNECT = BluetoothService.MESSAGE_UNABLE_CONNECT;
-  public static final String DEVICE_NAME = BluetoothService.DEVICE_NAME;
-  public static final String TOAST = BluetoothService.TOAST;
+
   public void getBluetoothManagerInstance(Context c) {                                        
     this.bluetoothManager = (BluetoothManager) c.getSystemService(Context.BLUETOOTH_SERVICE);
     this.bluetoothAdapter = this.bluetoothManager.getAdapter();
   }
   
-  // private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
-  //   @Override
-  //   public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-  //     UiThreadUtil.runOnUiThread(new Runnable() {
-  //       @Override
-  //       public void run() {
-  //         leDeviceListAdapter.addDevice(device);
-          
-  //         // leDeviceListAdapter.notifyDataSetChanged();
-  //       }
-  //     });
-  //   }
-  // };
-  public RNZebraBluetoothPrinterModule(ReactApplicationContext reactContext,BluetoothService bluetoothService) {
+
+  public RNZebraBluetoothPrinterModule(ReactApplicationContext reactContext,BluetoothService bluetoothService) {                  // Constructor
     super(reactContext);
     this.reactContext = reactContext;
     context = getReactApplicationContext();
@@ -132,13 +118,14 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       // ignore
     }
   }
+  
 
   @Override
   public String getName() {
     return "RNZebraBluetoothPrinter";
   }
   
-  private void emitRNEvent(String event, @Nullable WritableMap params) {                            
+  private void emitRNEvent(String event, @Nullable WritableMap params) {                                                          // emit events to JavaScript        
     getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(event, params);
   }
 
@@ -151,24 +138,19 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public void isEnabledBluetooth(final Promise promise) {                                                     //check if the bluetooth is enabled or not
     
     if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-      Toast.makeText(getReactApplicationContext(), "Disabled", Toast.LENGTH_LONG).show();
-      this.enableBluetooth();
       promise.resolve(false);
     }
     else {
-      Toast.makeText(getReactApplicationContext(), "Enabled", Toast.LENGTH_LONG).show();
       promise.resolve(true);
     }
   }
 
   @ReactMethod 
   public void scanDevices(final Promise promise) {                                                    //scan for unpaired devices
-    handler = new Handler();
     if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
       promise.reject("BT NOT ENABLED");
     } else {
       cancelDiscovery();
-     
       int permissionChecked = ContextCompat.checkSelfPermission(reactContext,
           android.Manifest.permission.ACCESS_COARSE_LOCATION);
       if (permissionChecked == PackageManager.PERMISSION_DENIED) {
@@ -187,11 +169,11 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   }
   @ReactMethod
   public void disableBluetooth(final Promise promise) {                                           // disable bluetooth
-    if( bluetoothAdapter == null ) {
+    if( bluetoothAdapter == null ) {    // bluetooth already disabled
       promise.resolve(true);
     }
     else {
-      bluetoothAdapter.disable();
+      bluetoothAdapter.disable();     // disable bluetooth
       promise.resolve(true);
     }
   }
@@ -270,12 +252,9 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       
         WritableArray app_list = Arguments.createArray();
         for (BluetoothDevice bt : pairedDevices) {
-          BluetoothClass bluetoothClass = bt.getBluetoothClass();
-          
-          // promise.resolve("inside for loop");
+          BluetoothClass bluetoothClass = bt.getBluetoothClass();    // get class of bluetooth device
          JSONObject info = new JSONObject();
           info.put("address", bt.getAddress());
-      
           info.put("class", bluetoothClass.getDeviceClass()); // 1664
           info.put("name", bt.getName());
           info.put("type", "paired");
@@ -485,9 +464,6 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
         loading = false;
         Log.d("Connection err", err.toString());
         promise.reject(err.toString());
-        // disconnect();
-        // promise.reject(E_LAYOUT_ERROR, err);
-
       } finally {
         disconnect();
       }
@@ -537,39 +513,5 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
                 break;
         }
       }
-
-
-// private class LeDeviceListAdapter {
-//         private ArrayList<BluetoothDevice> mLeDevices;
-//         // private LayoutInflater mInflator;
-//         public LeDeviceListAdapter() {
-//             super();
-//             mLeDevices = new ArrayList<BluetoothDevice>();
-//             // mInflator = DeviceScanActivity.this.getLayoutInflater();
-//         }
-//         public void addDevice(BluetoothDevice device) {
-//             if(!mLeDevices.contains(device)) {
-//                 mLeDevices.add(device);
-//             }
-//         }
-//         public BluetoothDevice getDevice(int position) {
-//             return mLeDevices.get(position);
-//         }
-//         public void clear() {
-//             mLeDevices.clear();
-//         }
-       
-//         public int getCount() {
-//             return mLeDevices.size();
-//         }
-       
-//         public Object getItem(int i) {
-//             return mLeDevices.get(i);
-//         }
-    
-//         public long getItemId(int i) {
-//             return i;
-//         }
-//       }
   
     }

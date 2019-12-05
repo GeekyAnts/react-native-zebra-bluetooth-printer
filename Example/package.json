@@ -10,10 +10,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "device-info": "^1.0.3",
     "react": "16.9.0",
-    "react-native": "0.61.4",
+    "react-native": "^0.61.2",
+    "react-native-device-info": "^5.3.1",
     "react-native-elements": "^1.2.7",
-    "react-native-zebra-bluetooth-printer": "file:../../zebra-bluetooth-printer"
+    "react-native-zebra-bluetooth-printer": "../../zebra-bluetooth-printer"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

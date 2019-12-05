@@ -25,7 +25,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "ZPrinterLEService.h"
 #import "React/RCTEventDispatcher.h"
-
+    
 @implementation RNZebraBluetoothPrinter;
 NSString *EVENT_DEVICE_ALREADY_PAIRED = @"EVENT_DEVICE_ALREADY_PAIRED";
 NSString *EVENT_DEVICE_DISCOVER_DONE = @"EVENT_DEVICE_DISCOVER_DONE";

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.zebrabluetoothprinter.RNZebraBluetoothPrinterPackage;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.zebrabluetoothprinter.RNZebraBluetoothPrinterPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
