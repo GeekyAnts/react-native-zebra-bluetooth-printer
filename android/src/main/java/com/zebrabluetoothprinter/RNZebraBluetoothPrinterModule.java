@@ -275,7 +275,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       if(adapter == null && adapter.isEnabled()) {
         BluetoothDevice device = adapter.getRemoteDevice(deviceAddress);
         this.unpair(device);
-        promise.resolve(address);
+        promise.resolve("disconnected successfully");
       }
       else {
         promise.reject("bluetooth not enabled");
