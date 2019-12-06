@@ -1,15 +1,4 @@
-//
-//  ZebraAPI.h
-//  CollectPlusStoreScan
-//
-//  Created by Anmol Jain on 26/08/19.
-//  Copyright © 2019 Facebook. All rights reserved.
-//
 
-// #import <React/RCTBridgeModule.h>
-
-// @interface ZebraAPI : NSObject <RCTBridgeModule>
-// @end
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 #import <CoreBluetooth/CoreBluetooth.h>
