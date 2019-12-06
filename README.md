@@ -36,10 +36,31 @@
 
 
 ## Usage
+
+# RNZebraBluetoothPrinter
+
+RNZebraBluetoothPrinter is a module for Bluetooth management and supports print functionality for zebra bluetooth printers ( only ble devices ). 
+It includes features like bluetooth enable/disable, pair/unpair a BLE/Bluetooth device, scan for nearby bluetooth devices and printing using bluetooth.
 ```javascript
 import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
 
 // TODO: What to do with the module?
 RNZebraBluetoothPrinter;
 ```
+1. isEnabledBluetooth == > async function, check the status of bluetooth service in the bluetooth client(mobile phone) .Returns true if already enabled, false if not enabled.
+2. enableBluetooth == > async function,
+	 Android: requests for bluetooth on/off permission on the android device.
+	 iOS: requests the user to go to settings and enable bluetooth as iOS doesn't give direct permission to access bluetooth.
+
+3. disableBluetooth == > async function,
+	Android: disables bluetooth if bluetooth is switched on.
+	iOS: simply resolves by nil.
+4. scanDevices == > async function, scans for available nearby bluetooth devices for a specific period of time.
+5. pairedDevices == > async function, 	
+	Android: returns already paired devices.
+	iOS: resolves to nil.
+6. unpairDevice == > async function,
+	Android: unpair/disconnect a paired device from paired device list.
+	iOS:
+7. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.		
   
