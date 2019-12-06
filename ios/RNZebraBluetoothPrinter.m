@@ -44,6 +44,8 @@ static NSObject<WriteDataToBleDelegate> *writeDataDelegate;// delegate of write 
 static NSData *toWrite;
 static NSTimer *timer;
 static CBPeripheral * printer;
+
+RCT_EXPORT_MODULE();
 +(Boolean)isConnected{
     return !(connected==nil);
 }
@@ -122,7 +124,7 @@ static CBPeripheral * printer;
 }
 
 
-RCT_EXPORT_MODULE(RNZebraBluetoothPrinter);
+
 
 RCT_EXPORT_METHOD(print:(NSString*)zpl
                   zplArrayLength:(NSUInteger*)zplArrayLength
