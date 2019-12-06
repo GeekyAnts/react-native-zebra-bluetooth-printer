@@ -78,12 +78,21 @@ const App: () => React$Node = () => {
               </Text></TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                NativeModules.RNZebraBluetoothPrinter.connectDevice("AC:3F:A4:AF:36:17").then(res => {
+                NativeModules.RNZebraBluetoothPrinter.connectDevice("38:F9:D3:AB:72:3E").then(res => {
                   Alert.alert(res);
                 });
               }}
             ><Text>
                connect to printer
+              </Text></TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                NativeModules.RNZebraBluetoothPrinter.unpairDevice("38:F9:D3:AB:72:3E").then(res => {
+                  Alert.alert(res);
+                });
+              }}
+            ><Text>
+                disconnect to device
               </Text></TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
