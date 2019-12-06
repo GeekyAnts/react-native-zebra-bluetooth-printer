@@ -48,19 +48,54 @@ import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
 RNZebraBluetoothPrinter;
 ```
 1. isEnabledBluetooth == > async function, check the status of bluetooth service in the bluetooth client(mobile phone) .Returns true if already enabled, false if not enabled.
+```javascript
+RNZebraBluetoothPrinter.isEnabledBluetooth().then((res)=>{
+	//do something with res
+})
+```
 2. enableBluetooth == > async function,
 	 Android: requests for bluetooth on/off permission on the android device.
 	 iOS: requests the user to go to settings and enable bluetooth as iOS doesn't give direct permission to access bluetooth.
-
+```javascript
+RNZebraBluetoothPrinter.enableBluetooth().then((res)=>{
+	//do something with res
+})
+```
 3. disableBluetooth == > async function,
 	Android: disables bluetooth if bluetooth is switched on.
 	iOS: simply resolves by nil.
+```javascript
+RNZebraBluetoothPrinter.disableBluetooth().then((res)=>{
+	//do something with res
+})
+```	
 4. scanDevices == > async function, scans for available nearby bluetooth devices for a specific period of time.
+```javascript
+RNZebraBluetoothPrinter.scanDevices().then((deviceArray)=>{
+	//do something with res
+})
+```	
 5. pairedDevices == > async function, 	
 	Android: returns already paired devices.
 	iOS: resolves to nil.
+```javascript
+RNZebraBluetoothPrinter.pairedDevices().then((deviceArray)=>{
+	//do something with deviceArray
+})
+```	
 6. unpairDevice == > async function,
 	Android: unpair/disconnect a paired device from paired device list.
 	iOS:
-7. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.		
+```javascript
+RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((deviceArray)=>{
+	//do something with deviceArray
+})
+```		
+7. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.	
+# Android
+```javascript
+RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((deviceArray)=>{
+	//do something with res
+})
+```		
   
