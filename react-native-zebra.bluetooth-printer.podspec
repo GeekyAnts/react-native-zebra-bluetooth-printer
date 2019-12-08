@@ -1,6 +1,8 @@
+require "json"
 
+package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 Pod::Spec.new do |s|
-  s.name         = "RNZebraBluetoothPrinter"
+  s.name         = "react-native-zebra-bluetooth-printer"
   s.version      = "1.0.0"
   s.summary      = "RNZebraBluetoothPrinter"
   s.description  = <<-DESC
@@ -9,9 +11,9 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/anmoljain10/react-native-zebra-bluetooth-printer.git"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
   s.author             = { "author" => "author@domain.cn" }
-  s.platform     = :ios, "7.0"
-  s.source       = { :git => "https://github.com/anmoljain10/react-native-zebra-bluetooth-printer.git/ios", :tag => "master" }
-  s.source_files  = "ios/RNZebraBluetoothPrinter.h,m"
+  s.platform     = :ios, "9.0"
+  s.source       = { :git => "https://github.com/anmoljain10/react-native-zebra-bluetooth-printer.git", :tag => "#{s.version}" }
+  s.source_files = "ios/**/*.{h,m,swift}"
   s.requires_arc = true
 
 
