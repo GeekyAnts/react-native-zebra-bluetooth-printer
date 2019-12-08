@@ -1,10 +1,4 @@
-//
-//  ZPrinterLEService.h
-//  ZebraPrinterBLEDemo
-//
-//  Created by Zebra ISV Team on 11/16/17.
-//  Copyright © 2017 Zebra. All rights reserved.
-//
+
 
 #ifndef ZPrinterLEService_h
 #define ZPrinterLEService_h

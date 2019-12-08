@@ -1,25 +1,4 @@
-//
-//  ZebraAPI.m
-//  CollectPlusStoreScan
-//
-//  Created by Anmol Jain on 26/08/19.
-//  Copyright © 2019 Facebook. All rights reserved.
-//
 
-// #import "ZebraAPI.h"
-// #import <React/RCTLog.h>
-
-// @implementation ZebraAPI
-
-// RCT_EXPORT_MODULE();
-
-// RCT_EXPORT_METHOD(addEvent:(NSString *)name location:(NSString *)location)
-// {
- 
-//   RCTLogInfo(@"Pretending to createan event %@ at %@", name, location);
-// }
-
-// @end
 #import <Foundation/Foundation.h>
 #import "RNZebraBluetoothPrinter.h"
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -134,16 +113,6 @@ RCT_EXPORT_METHOD(print:(NSString*)zpl
 {
     NSLog(@"print called %@",_writeCharacteristic);
     NSLog(@"print calles %@",_printer);
-//   NSString *zpl= @"CT~~CD,~CC^~CT~\n^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ\n^XA\n^MMT\n^PW734\n^LL1231\n^LS0\n^FO0,768^GFA,38272,38272,00092,:Z64:\neJzs0aERADAIADEG6/AM1rvWIjAIXH6AmI+QJEmSVHtrXXZj59rJw2az2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZo/sDwAA///t3SEBAAAAwrD+rQmARrEHWIWz2Ww2m81ms7/s5ced3bYkSZK+CxLzLNk=:2676\n^FO544,384^GFA,08448,08448,00024,:Z64:\neJzt2bENACAMA8F0LMVwDI4EC6SJFKjuy2s8gCOk/sbJ2n2+stXJOeecc84555xzzjnnnHPOOa/4419P+tkF6t+Orw==:613B\n^FO0,384^GFA,03072,03072,00024,:Z64:\neJxjYBgFo4B88B8reEA18QfYLGUcFR8VHxUfFR8VHxVHFad1fTQKRsFwAgDs9Soi:881A\n^FO0,64^GFA,11776,11776,00092,:Z64:\neJzt2kENACAQA8HzrxIJOAAB8LqkISGzAubTb6skdVqxJvtij9iSbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2W/s5NeCfdqSJP3SBqioe54=:6F90\n^FO160,384^GFA,06656,06656,00052,:Z64:\neJzt16ENACAMRNEyAftvxyZgcU1NQ8j7/omTFyFJnzZ2refNKs2fDMMwDMMwDMMwTGK6/lyTkSTp6gCtY7SA:79AF\n^FO160,160^GFA,13312,13312,00052,:Z64:\neJzt2rENACAMA8F0rM3I2QDECGkiBPf9Fe4dIZ1WrXm7ydL6wTAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzBfm66/f5d5qw1iM9Ft:54B5\n^FO0,160^GFA,23552,23552,00092,:Z64:\neJzt3DENACAUQ8EvDP86EEICAmAiKSz3BNzSvVWSbpqxBvtg99iSjc1ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZn+wk3+m7N3W2xZx7Nny:39B6\n^FO0,448^GFA,13824,13824,00072,:Z64:\neJzt2jENADAMA8EwKH+WZdBS6OBIVXQP4AbPrpIkSertJBrs7MDGi8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw3l0Uj/Yqc5vXbfZvV8=:185D\n^FO0,608^GFA,09216,09216,00072,:Z64:\neJzt2DEVACAMQ8Fu2EYqTkBEs9B3X8ANGVMlSZK63UR7rnMCGy8Oh8PhcDgcDofD4XA4HA7nUyf1s011JElSvwcBgIlT:9B3D\n^FO0,704^GFA,11776,11776,00092,:Z64:\neJzt2aERACAQA8Evm7KRODA4sBE/s1fAmshU9WzHWuyPPWNLDjabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2ddOfv/s15YkSZI6dgABKlDe:FE9A\n^FO352,64^GFA,06144,06144,00048,:Z64:\neJzt10uOnDAQBmBbLFhyBF8kCleaZRZRY2kOkqPEN8gVmBuQnaVBVOovmzYPQyCaTtIS1sht4IP2YLvKrdRVnqxUdLj0l7/8v/WqUc38mKsWrjzuHVxx3NuTXp3zw0nvH+zbB3v7WB9e5+O8//veq7ESP6ga1lbiu7W3ymCWl9G3aOG54t3KDzjiSkdv0cKw1jT2zk+9B0U3G/GDtPDcyqnQtblHDxtUtfheWlglZd6jhzVmlRHfSQvfUuQ9Johx0oZvpYWLOu/xYXBTKd5Jq0teBiH5QWmvaqVwLniyBfvKFhue+3HjR1ot3pbUFvw6yZdZ3/M5h6pT4vmU1+Q09VXWez7+2cvJ4Gu+Qo7HmN9XTRlP9I6qF32TGSSz51uMV3PfYfS5B6ym3sT5ufbcDBW/pUZ9jfO03vItZmOHyorXR7xU1oze3sLMzHosAalc8p8P+y9F8PRR3i28LL89b4TKTXf/6azXf+qxMNQzebx/6n/jWzMbL8zoTZ8Z37Uvd+fDGa+Db+a+2p3/Ex/HN3lZWov1SLRcX83u+t316/hAP1bxgbbjDz/5VeLP9w3f0Ns0vnHw12N8+wDfM3BS3eMt4ifibfJl8gPyBOK5ivEcwZ+zTNOVyZvkOb90yBcvKV/wH+cLOc54jPgkH7VqzK86+XrpnRrzHTJXEfJd3uOBk3zq5Zskn+Z9Jl+HrJn+33eaeNkP4CDuH+ROZHGT94Ps1mULEvcbGJ027CfGSTTx/CiDatw6dbiTr2qal7RfwpX+fjnul9zyp8cT/N65/OX/L3+Vq1zlKtnyC7+HEQk=:C478\n^BY4,3,160^FT50,1068^BCN,,Y,N\n^FD>;8900>60JX>553713012^FS\n^FT31,390^A0N,51,50^FH\^FDNRHT^FS\n^FT193,455^A0N,28,28^FH\^FDNN4 5EL^FS\n^FT96,764^A0N,28,28^FH\^FDStorekeeper instruction: GIVE TO DRIVER^FS\n^FT578,668^A0N,51,50^FH\^FD72 HR^FS\n^FT94,682^A0N,28,28^FH\^FDParcel label for ECPABCDEFGH^FS\n^FT33,439^A0N,20,19^FH\^FDCreation Date: ^FS\n^FT33,463^A0N,20,19^FH\^FD06-06-2019^FS\n^FT589,556^A0N,102,100^FH\^FD72^FS\n^FT560,328^A0N,102,100^FH\^FD02A^FS\n^FT93,517^A0N,25,24^FH\^FDClick & Collect your online purchases ^FS\n^FT93,548^A0N,25,24^FH\^FD      to your local Collect+ store^FS\n^FT93,610^A0N,25,24^FH\^FDwww.collectplus.co.uk/services^FS\n^FT42,303^A0N,102,100^FH\^FD12^FS\n^FT190,225^A0N,28,28^FH\^FDJohn Lewis^FS\n^FT190,259^A0N,28,28^FH\^FDClipper Logistics^FS\n^FT190,293^A0N,28,28^FH\^FDUnit 1, Saxon Avenue,^FS\n^FT190,327^A0N,28,28^FH\^FDGrange Park^FS\n^FT190,361^A0N,28,28^FH\^FDNorthampton^FS\n^FT190,395^A0N,28,28^FH\^FDNorthamptonshire^FS\n^PQ1,0,1,Y^XZ";
-
-    // NSString *zpl=@"^XA ^LT120^FX Top section^CFB,25^FO50,173^FDFROM:^FS^FO200,173^FDTest sender^FS^FO200,228^FD10 MOUNTAIN PKWY^FS^FO200,283^FDTN, COLLIERVILLE, 38017^FS^FO50,343^GB706,1,3^FS^FX Second section with recipient address^CFB,25^FO50,363^FDTO:^FS^FO200,363^FDJohn Smith^FS^FO200,423^FDAccounts Payable Dept.^FS^FO200,473^FD123 Market Street^FS^FO200,523^FDTX, Dallas, 75270^FS^FO50,4830^GB706,1,3^FS^FX Third section with shipment numbers^CFB,25^FO60,593^FDPO#^FS^FO230,593^FB542,1,0,N,0^FD0001234^FS^FO60,623^FDDept.^FS^FO230,653^FB542,1,0,N,0^FD^FS^FO60,723^FDStore^FS^FO230,723^FB542,1,0,N,0^FDMAIN BRANCH^FS^FO60,823^FDDuns#^FS^FO230,823^FB542,1,0,N,0^FD123123123^FS^FO50,873^GB706,1,3^FS^FX Fourth section with package description^CFB,25^FO60,893^FB692,5,4,N,0^FDPRODUCT A x 1, PRODUCT B x 4\&^FS^FX Fifth section with Box counter^CFB,25^FO60,1000^FB692,1,0,C,0^FDBox 1 of 1^FS^FO60,1000^FB692,1,0,C,0^FD__________^FS^FO60,1000^FB692,1,0,C,0^FD__________^FS^XZ";      
-//   NSString * zpl=@"^XA\n^FX Top section with company logo, name and address.\n^CF0,60\n^FO50,50^GB100,100,100^FS\n^FO75,75^FR^GB100,100,100^FS\n^FO88,88^GB50,50,50^FS\n^FO220,50^FDInternational Shipping, Inc.^FS\n^CF0,40\n^FO220,100^FD1000 Shipping Lane^FS\n^FO220,135^FDShelbyville TN 38102^FS\n^FO220,170^FDUnited States (USA)^FS\n^FO50,250^GB700,1,3^FS\n^FX Third section with barcode.\n^BY5,2,270\n^FO100,550^BC^FD12345678^FS\n^FO100,60^A0N,25,25^FB400,2,10,C,0^FDAlex Kuzmenya.Hello World !!!! Alex Kuzmenya. long ling 231^FS^\n^FX Fourth section (the two boxes on the bottom).^FO50,900^GB700,250,3^FS^FO400,900^GB1,250,3^FS^CF0,40^FO100,960^FDShipping Ctr. X34B-1^FS^FO100,1010^FDREF1 F00B47^FS^FO100,1060^FDREF2 BL4H8^FS^CF0,190^FO485,965^FDCA^FS\n^XZ";
-//   NSString * zpl=@"^XA^FO100,60^A0N,25,25^FB400,2,10,C,0^FDAlex Kuzmenya. Hello World !!!! Alex Kuzmenya. long ling 231^FS^XZ";
-// NSString *zpl =@"CT~~CD,~CC^~CT~\n^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0\n^MMT\n^PW734\n ^LL1231\n^LS0\n^BY4,3,160^FT50,1068^BCN,,Y,N\n^FT190,225^A0N,28,28^FH\^FDJohn Lewis^FS\n^FT190,259^A0N,28,28^FH\^FDClipper Logistics^FS\n^FT190,293^A0N,28,28^FH\^FDUnit 1, Saxon Avenue,^FS\n^FT190,327^A0N,28,28^FH\^FDGrange Park^FS\n^FT190,361^A0N,28,28^FH\^FDNorthampton^FS\n^FT190,395^A0N,28,28^FH\^FDNorthamptonshire^FS\n^PQ1,0,1,Y^XZ";
-// NSString *zpl =@"CT~~CD,~CC^~CT~\n^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0\n^MMT\n^PW734\n ^LL1231\n^LS0\n^BY4,3,160^FT50,1068^BCN,,Y,N\n^FT190,225^A0N,28,28^FH\^FDJohn Lewis^FS\n^FT190,259^A0N,28,28^FH\^FDClipper Logistics^FS\n^FT190,293^A0N,28,28^FH\^FDUnit 1, Saxon Avenue,^FS\n^FT190,327^A0N,28,28^FH\^FDGrange Park^FS\n^FT190,361^A0N,28,28^FH\^FDNorthampton^FS\n^FT190,395^A0N,28,28^FH\^FDNorthamptonshire^FS\n^PQ1,0,1,Y^XZ";
-// NSString *zpl =@"CT~~CD,~CC^~CT~^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^MMT^PW734 ^LL1231^LS0^BY4,3,160^FT50,1068^BCN,,Y,N^FT190,225^A0N,28,28^FH\^FDJohn Lewis^FS^FT190,259^A0N,28,28^FH\^FDClipper Logistics^FS^FT190,293^A0N,28,28^FH\^FDUnit 1, Saxon Avenue,^FS^FT190,327^A0N,28,28^FH\^FDGrange Park^FS^FT190,361^A0N,28,28^FH\^FDNorthampton^FS^FT190,395^A0N,28,28^FH\^FDNorthamptonshire^FS^PQ1,0,1,Y^XZ";
-
-
   self.printResolveBlock=resolve;
   self.printRejectBlock=reject;
   NSString *szpl = [zpl stringByAppendingString:@"\r\n"];
@@ -151,8 +120,8 @@ RCT_EXPORT_METHOD(print:(NSString*)zpl
     size_t len = [szpl length];
     NSData *payload = [NSData dataWithBytes:bytes length:len];
     NSUInteger length = [payload length];
-NSUInteger chunkSize = 50;
-NSUInteger offset = 0;
+    NSUInteger chunkSize = 50;
+    NSUInteger offset = 0;
 do {
     NSUInteger thisChunkSize = length - offset > chunkSize ? chunkSize : length - offset;
     NSData* chunk = [NSData dataWithBytesNoCopy:(char *)[payload bytes] + offset  
@@ -160,36 +129,21 @@ do {
                     offset += thisChunkSize;
     [self.printer writeValue:chunk forCharacteristic:self.writeCharacteristic type:CBCharacteristicWriteWithResponse];
  
-   NSLog(@"chunk:%@",chunk);
-   NSLog(@"chunk:%@",chunk);
-   NSLog(@"chunk:%@",chunk);
-   NSLog(@"chunk:%@",chunk);
+
 } while (offset < length);
-    // NSData *payload =[[NSData alloc] initWithBase64EncodedString:zpl options:NSDataBase64DecodingIgnoreUnknownCharacters];
- NSLog(@"Writing payload: %@ length of %zu", payload, length);
-   NSLog(@"inde is %zd and zp is %zd",index,zplArrayLength);
-
-     NSLog(@"index is %zd and zpl is %zd",index,zplArrayLength);
-  printCompleted=YES;
-
-//   NSString*zpl= @"CT~~CD,~CC^~CT~\n^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6~SD15^JUS^LRN^CI0^XZ\n^XA\n^MMT\n^PW734\n^LL1231\n^LS0\n^FO0,768^GFA,38272,38272,00092,:Z64:\neJzs0aERADAIADEG6/AM1rvWIjAIXH6AmI+QJEmSVHtrXXZj59rJw2az2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZo/sDwAA///t3SEBAAAAwrD+rQmARrEHWIWz2Ww2m81ms7/s5ced3bYkSZK+CxLzLNk=:2676\n^FO544,384^GFA,08448,08448,00024,:Z64:\neJzt2bENACAMA8F0LMVwDI4EC6SJFKjuy2s8gCOk/sbJ2n2+stXJOeecc84555xzzjnnnHPOOa/4419P+tkF6t+Orw==:613B\n^FO0,384^GFA,03072,03072,00024,:Z64:\neJxjYBgFo4B88B8reEA18QfYLGUcFR8VHxUfFR8VHxVHFad1fTQKRsFwAgDs9Soi:881A\n^FO0,64^GFA,11776,11776,00092,:Z64:\neJzt2kENACAQA8HzrxIJOAAB8LqkISGzAubTb6skdVqxJvtij9iSbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2W/s5NeCfdqSJP3SBqioe54=:6F90\n^FO160,384^GFA,06656,06656,00052,:Z64:\neJzt16ENACAMRNEyAftvxyZgcU1NQ8j7/omTFyFJnzZ2refNKs2fDMMwDMMwDMMwTGK6/lyTkSTp6gCtY7SA:79AF\n^FO160,160^GFA,13312,13312,00052,:Z64:\neJzt2rENACAMA8F0rM3I2QDECGkiBPf9Fe4dIZ1WrXm7ydL6wTAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzBfm66/f5d5qw1iM9Ft:54B5\n^FO0,160^GFA,23552,23552,00092,:Z64:\neJzt3DENACAUQ8EvDP86EEICAmAiKSz3BNzSvVWSbpqxBvtg99iSjc1ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZn+wk3+m7N3W2xZx7Nny:39B6\n^FO0,448^GFA,13824,13824,00072,:Z64:\neJzt2jENADAMA8EwKH+WZdBS6OBIVXQP4AbPrpIkSertJBrs7MDGi8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw3l0Uj/Yqc5vXbfZvV8=:185D\n^FO0,608^GFA,09216,09216,00072,:Z64:\neJzt2DEVACAMQ8Fu2EYqTkBEs9B3X8ANGVMlSZK63UR7rnMCGy8Oh8PhcDgcDofD4XA4HA7nUyf1s011JElSvwcBgIlT:9B3D\n^FO0,704^GFA,11776,11776,00092,:Z64:\neJzt2aERACAQA8Evm7KRODA4sBE/s1fAmshU9WzHWuyPPWNLDjabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2ddOfv/s15YkSZI6dgABKlDe:FE9A\n^FO352,64^GFA,06144,06144,00048,:Z64:\neJzt10uOnDAQBmBbLFhyBF8kCleaZRZRY2kOkqPEN8gVmBuQnaVBVOovmzYPQyCaTtIS1sht4IP2YLvKrdRVnqxUdLj0l7/8v/WqUc38mKsWrjzuHVxx3NuTXp3zw0nvH+zbB3v7WB9e5+O8//veq7ESP6ga1lbiu7W3ymCWl9G3aOG54t3KDzjiSkdv0cKw1jT2zk+9B0U3G/GDtPDcyqnQtblHDxtUtfheWlglZd6jhzVmlRHfSQvfUuQ9Johx0oZvpYWLOu/xYXBTKd5Jq0teBiH5QWmvaqVwLniyBfvKFhue+3HjR1ot3pbUFvw6yZdZ3/M5h6pT4vmU1+Q09VXWez7+2cvJ4Gu+Qo7HmN9XTRlP9I6qF32TGSSz51uMV3PfYfS5B6ym3sT5ufbcDBW/pUZ9jfO03vItZmOHyorXR7xU1oze3sLMzHosAalc8p8P+y9F8PRR3i28LL89b4TKTXf/6azXf+qxMNQzebx/6n/jWzMbL8zoTZ8Z37Uvd+fDGa+Db+a+2p3/Ex/HN3lZWov1SLRcX83u+t316/hAP1bxgbbjDz/5VeLP9w3f0Ns0vnHw12N8+wDfM3BS3eMt4ifibfJl8gPyBOK5ivEcwZ+zTNOVyZvkOb90yBcvKV/wH+cLOc54jPgkH7VqzK86+XrpnRrzHTJXEfJd3uOBk3zq5Zskn+Z9Jl+HrJn+33eaeNkP4CDuH+ROZHGT94Ps1mULEvcbGJ027CfGSTTx/CiDatw6dbiTr2qal7RfwpX+fjnul9zyp8cT/N65/OX/L3+Vq1zlKtnyC7+HEQk=:C478\n^BY4,3,160^FT50,1068^BCN,,Y,N\n^FD>;8900>60JX>553713012^FS\n^FT31,390^A0N,51,50^FH\^FDNRHT^FS\n^FT193,455^A0N,28,28^FH\^FDNN4 5EL^FS\n^FT96,764^A0N,28,28^FH\^FDStorekeeper instruction: GIVE TO DRIVER^FS\n^FT578,668^A0N,51,50^FH\^FD72 HR^FS\n^FT94,682^A0N,28,28^FH\^FDParcel label for ECPABCDEFGH^FS\n^FT33,439^A0N,20,19^FH\^FDCreation Date: ^FS\n^FT33,463^A0N,20,19^FH\^FD06-06-2019^FS\n^FT589,556^A0N,102,100^FH\^FD72^FS\n^FT560,328^A0N,102,100^FH\^FD02A^FS\n^FT93,517^A0N,25,24^FH\^FDClick & Collect your online purchases ^FS\n^FT93,548^A0N,25,24^FH\^FD      to your local Collect+ store^FS\n^FT93,610^A0N,25,24^FH\^FDwww.collectplus.co.uk/services^FS\n^FT42,303^A0N,102,100^FH\^FD12^FS\n^FT190,225^A0N,28,28^FH\^FDJohn Lewis^FS\n^FT190,259^A0N,28,28^FH\^FDClipper Logistics^FS\n^FT190,293^A0N,28,28^FH\^FDUnit 1, Saxon Avenue,^FS\n^FT190,327^A0N,28,28^FH\^FDGrange Park^FS\n^FT190,361^A0N,28,28^FH\^FDNorthampton^FS\n^FT190,395^A0N,28,28^FH\^FDNorthamptonshire^FS\n^PQ1,0,1,Y^XZ";
  
+  printCompleted=YES; 
 }
 
 
 //isBluetoothEnabled
-RCT_EXPORT_METHOD(isBluetoothEnabled:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(isEnabledBluetooth:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     CBManagerState state = [self.centralManager  state];
     resolve(state == CBManagerStatePoweredOn?@"true":@"false");//canot pass boolean or int value to resolve directly.
 }
-RCT_EXPORT_METHOD(printSuccess:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
-    
-    resolve(self.printerSuccess == true?@"true":@"false");//canot pass boolean or int value to resolve directly.
-}
+
 //enableBluetooth
 RCT_EXPORT_METHOD(enableBluetooth:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
@@ -272,37 +226,15 @@ RCT_EXPORT_METHOD(stopScan:(RCTPromiseResolveBlock)resolve
     [self callStop];
     resolve(nil);
 }
-RCT_EXPORT_METHOD(getPairedDevices:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
-    NSMutableArray *serviceUUIDs = [NSMutableArray new];
-    CBUUID *serviceUUID =[CBUUID UUIDWithString:@"38EB4A82-C570-11E3-9507-0002A5D5C51B"];
-    [serviceUUIDs addObject:serviceUUID];
-     NSArray *connectedPeripherals = [self.centralManager retrieveConnectedPeripheralsWithServices:serviceUUIDs];
-     NSLog(@"PairedD: %zd",[connectedPeripherals count]);
-    resolve(nil);
-}
+
 //connect(address)
-RCT_EXPORT_METHOD(connect:(NSString *)address
+RCT_EXPORT_METHOD(connectDevice:(NSString *)address
                   findEventsWithResolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSLog(@"Trying to connect....%@",address);
     [self callStop];
-    // if(connected){
-    //     NSString *connectedAddress =connected.identifier.UUIDString;
-    //     NSLog(@"String is:%@",connectedAddress);
-    //     if([address isEqualToString:connectedAddress]){
-    //         NSLog(@"peripheralConnected %@",connected.name);
-    //         resolve(nil);
-    //         return;
-    //     }else{
-    //         NSLog(@"peripheralConnectionCanceled");
-    //         [self.centralManager cancelPeripheralConnection:connected];
-    //         //Callbacks:
-    //         //entralManager:didDisconnectPeripheral:error:
-    //     }
-    // }
+  
     CBPeripheral *peripheral = [self.foundDevices objectForKey:address];
     self.connectResolveBlock = resolve;
     self.connectRejectBlock = reject;
