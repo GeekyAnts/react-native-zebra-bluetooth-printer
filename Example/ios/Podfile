@@ -39,7 +39,6 @@ target 'Example' do
 
   pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
 
-  pod 'RNZebraBluetoothPrinter', :path => '../node_modules/react-native-zebra-bluetooth-printer'
 
   target 'ExampleTests' do
     inherit! :search_paths
