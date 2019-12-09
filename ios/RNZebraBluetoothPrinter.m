@@ -118,8 +118,7 @@ do {
                     offset += thisChunkSize;
     [self.printer writeValue:chunk forCharacteristic:self.writeCharacteristic type:CBCharacteristicWriteWithResponse];
 } while (offset < length);
- 
-  printCompleted=YES; 
+  printCompleted = YES; 
 }
 
 
@@ -159,9 +158,7 @@ RCT_EXPORT_METHOD(pairedDevices:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(scanDevices:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-
     @try{
-       
         if (!self.centralManager || self.centralManager.state!=CBManagerStatePoweredOn) {
             reject(@"BLUETOOTCH_INVALID_STATE",@"BLUETOOTCH_INVALID_STATE",nil);
             return;
@@ -178,8 +175,7 @@ RCT_EXPORT_METHOD(scanDevices:(RCTPromiseResolveBlock)resolve
             if (state) {
                 status=@"connected";
             }
-            else
-            {
+            else {
                 status=@"not-connected";
             }
             NSDictionary *idAndName =@{@"address":connected.identifier.UUIDString,@"name":connected.name?connected.name:@"",@"state":status};
@@ -208,6 +204,27 @@ RCT_EXPORT_METHOD(scanDevices:(RCTPromiseResolveBlock)resolve
         reject([exception name],[exception name],nil);
     }
 }
+- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *, id> *)advertisementData RSSI:(NSNumber *)RSSI{
+    NSLog(@"did discover peripheral: %@",peripheral);
+  
+    NSDictionary *idAndName =@{@"address":peripheral.identifier.UUIDString,@"name":peripheral.name?peripheral.name:@"",@"state":peripheral};
+    NSDictionary *peripheralStored = @{peripheral.identifier.UUIDString:peripheral};
+    if ( !self.foundDevices ) {
+        self.foundDevices = [[NSMutableDictionary alloc] init];
+    }
+    [self.foundDevices addEntriesFromDictionary:peripheralStored];
+    NSLog(@"CentralManager");
+   
+    if(hasListeners) {
+        NSLog(@"Listeners");
+        [self sendEventWithName:EVENT_DEVICE_FOUND body:@{@"device":idAndName}];
+    }
+    if(_waitingConnect && [_waitingConnect isEqualToString: peripheral.identifier.UUIDString]){
+        NSLog(@"stopcall");
+        [self.centralManager connectPeripheral:peripheral options:nil];
+        [self callStop];
+    }
+}
 
 //stop scan
 RCT_EXPORT_METHOD(stopScan:(RCTPromiseResolveBlock)resolve
@@ -232,29 +249,10 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
           _waitingConnect = address;
           NSLog(@"Trying to connectPeripheral....%@",address);
         [self.centralManager connectPeripheral:peripheral options:nil];
-         [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(discoverWriteCharacteristic:)
-                                                 name:ZPRINTER_WRITE_NOTIFICATION
-                                               object:nil];
-
-    // Register for notification on data received from Read Characteristic
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(receivedDataFromReadCharacteristic:)
-                                                 name:ZPRINTER_READ_NOTIFICATION
-                                               object:nil];
-
-    //////////////////////////////////////////////////////////
-    // Register for notification on DIS values received from DIS Characteristic
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(receivedDataFromDISCharacteristic:)
-                                                 name:ZPRINTER_DIS_NOTIFICATION
-                                               object:nil];
-   
-    
         // Callbacks:
         //    centralManager:didConnectPeripheral:
         //    centralManager:didFailToConnectPeripheral:error:
-    }else{
+    } else {
           //starts the scan.
         _waitingConnect = address;
          NSLog(@"Scan to find ....%@",address);
@@ -263,58 +261,40 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
         //centralManager:didDiscoverPeripheral:advertisementData:RSSI:
     }
 }
-//unpaire(address)
-- (void)discoverWriteCharacteristic:(NSNotification *) notification {
-    NSLog(@"called write function");
-    // Set the writeCharacteristic
-    self.writeCharacteristic = [notification userInfo][@"Characteristic"];
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral{
+    NSLog(@"did connected: %@",peripheral);
+    connected = peripheral;
+    NSString *pId = peripheral.identifier.UUIDString;
+    if(_waitingConnect && [_waitingConnect isEqualToString: pId] && self.connectResolveBlock){
+        NSLog(@"Predefined the support services, stop to looking up services.");
+        self.connectResolveBlock(nil);
+        _waitingConnect = nil;
+        self.connectRejectBlock = nil;
+        self.connectResolveBlock = nil;
 
-    // Update the title to connected
-    // self.title = @"Connected";
-
-    // Enable the send button
-  
-}
-
-// This callback is called when data from READ_FROM_ZPRINTER_CHARACTERISTIC_UUID is received.
-- (void)receivedDataFromReadCharacteristic:(NSNotification *) notification {
-    
-    // Extract the data from notification
-    [self.data appendData:[notification userInfo][@"Value"]];
-
-    // Display data in statusTextview
-    // [self.statusTextview setText:[[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding]];
-
-    // Scroll the textview to the bottom.
-    // NSRange bottom = NSMakeRange(self.statusTextview.text.length - 1, 1);
-    // [self.statusTextview scrollRangeToVisible:bottom];
-}
-
-// This callback is called when data from DIS is received.
-- (void)receivedDataFromDISCharacteristic:(NSNotification *) notification {
-
-    // Extract Characteristic UUID & text
-    NSString *uuid = [notification userInfo][@"Characteristic"];
-    NSData *value = [notification userInfo][@"Value"];
-    NSString *text = [[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding];
-
-    // Set the corresponding fields
-    if ([uuid isEqual:ZPRINTER_DIS_CHARAC_MODEL_NAME]) {
-        self.disName.text = text;
-    } else if ([uuid isEqual:ZPRINTER_DIS_CHARAC_SERIAL_NUMBER]) {
-        self.disSerialNumber.text = text;
-    } else if ([uuid isEqual:ZPRINTER_DIS_CHARAC_FIRMWARE_REVISION]) {
-        self.disFirmwareRevision.text = text;
-    } else if ([uuid isEqual:ZPRINTER_DIS_CHARAC_HARDWARE_REVISION]) {
-        self.disHardwareRevision.text = text;
-    } else if ([uuid isEqual:ZPRINTER_DIS_CHARAC_SOFTWARE_REVISION]) {
-        self.disSoftwareRevision.text = text;
-    } else if ([uuid isEqual:ZPRINTER_DIS_CHARAC_MANUFACTURER_NAME]) {
-        self.disManufacturerName.text = text;
     }
-
+    peripheral.delegate=self;
+    _printer=peripheral;
+    self.printer=peripheral;    
+       NSLog(@"going to emit EVENT_CONNECTED.");
+        [peripheral discoverServices:@[[CBUUID UUIDWithString:ZPRINTER_SERVICE_UUID], [CBUUID UUIDWithString:ZPRINTER_DIS_SERVICE]]];
+    if (hasListeners) {
+        [self sendEventWithName:EVENT_CONNECTED body:@{@"device":@{@"name":peripheral.name?peripheral.name:@"",@"address":peripheral.identifier.UUIDString}}];
+    }
 }
-
+- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(nullable NSError *)error{
+    if (self.connectRejectBlock) {
+        RCTPromiseRejectBlock rjBlock = self.connectRejectBlock;
+        rjBlock(@"",@"",error);
+        self.connectRejectBlock = nil;
+        self.connectResolveBlock = nil;
+        _waitingConnect = nil;
+    }
+    connected = nil;
+    if (hasListeners) {
+        [self sendEventWithName:EVENT_UNABLE_CONNECT body:@{@"name":peripheral.name?peripheral.name:@"",@"address":peripheral.identifier.UUIDString}];
+    }
+    }
 -(void)callStop{
     if (self.centralManager.isScanning) {
         [self.centralManager stopScan];
@@ -373,9 +353,7 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
             if (![CBCentralManager instancesRespondToSelector:@selector(initWithDelegate:queue:options:)]) {
                 //for ios version lowser than 7.0
                 self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
-            } else
-            {
-                
+            } else {
                 self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:@{CBCentralManagerOptionShowPowerAlertKey:@(YES)} ];
             }
         }
@@ -392,50 +370,6 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
  **/
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central{
     NSLog(@"%ld",(long)central.state);
-}
-
-- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *, id> *)advertisementData RSSI:(NSNumber *)RSSI{
-    NSLog(@"did discover peripheral: %@",peripheral);
-  
-    NSDictionary *idAndName =@{@"address":peripheral.identifier.UUIDString,@"name":peripheral.name?peripheral.name:@"",@"state":peripheral};
-    NSDictionary *peripheralStored = @{peripheral.identifier.UUIDString:peripheral};
-    if ( !self.foundDevices ) {
-        self.foundDevices = [[NSMutableDictionary alloc] init];
-    }
-    [self.foundDevices addEntriesFromDictionary:peripheralStored];
-    NSLog(@"CentralManager");
-   
-    if(hasListeners) {
-        NSLog(@"Listeners");
-        [self sendEventWithName:EVENT_DEVICE_FOUND body:@{@"device":idAndName}];
-    }
-    if(_waitingConnect && [_waitingConnect isEqualToString: peripheral.identifier.UUIDString]){
-        NSLog(@"stopcall");
-        [self.centralManager connectPeripheral:peripheral options:nil];
-        [self callStop];
-    }
-}
-
-- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral{
-    NSLog(@"did connected: %@",peripheral);
-    connected = peripheral;
-    NSString *pId = peripheral.identifier.UUIDString;
-    if(_waitingConnect && [_waitingConnect isEqualToString: pId] && self.connectResolveBlock){
-        NSLog(@"Predefined the support services, stop to looking up services.");
-        self.connectResolveBlock(nil);
-        _waitingConnect = nil;
-        self.connectRejectBlock = nil;
-        self.connectResolveBlock = nil;
-
-    }
-    peripheral.delegate=self;
-    _printer=peripheral;
-    self.printer=peripheral;    
-       NSLog(@"going to emit EVENT_CONNECTED.");
-        [peripheral discoverServices:@[[CBUUID UUIDWithString:ZPRINTER_SERVICE_UUID], [CBUUID UUIDWithString:ZPRINTER_DIS_SERVICE]]];
-    if (hasListeners) {
-        [self sendEventWithName:EVENT_CONNECTED body:@{@"device":@{@"name":peripheral.name?peripheral.name:@"",@"address":peripheral.identifier.UUIDString}}];
-    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(nullable NSError *)error{
@@ -459,36 +393,6 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
     }
 }
 
-- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(nullable NSError *)error{
-    if (self.connectRejectBlock) {
-        RCTPromiseRejectBlock rjBlock = self.connectRejectBlock;
-        rjBlock(@"",@"",error);
-        self.connectRejectBlock = nil;
-        self.connectResolveBlock = nil;
-        _waitingConnect = nil;
-    }
-    connected = nil;
-    if (hasListeners) {
-        [self sendEventWithName:EVENT_UNABLE_CONNECT body:@{@"name":peripheral.name?peripheral.name:@"",@"address":peripheral.identifier.UUIDString}];
-    }
-    }
-
-/**
- * END OF CBCentralManagerDelegate
- **/
-
-/*!
- *  @method peripheral:didDiscoverServices:
- *
- *  @param peripheral    The peripheral providing this information.
- *    @param error        If an error occurred, the cause of the failure.
- *
- *  @discussion            This method returns the result of a @link discoverServices: @/link call. If the service(s) were read successfully, they can be retrieved via
- *                        <i>peripheral</i>'s @link services @/link property.
- *
- */
-
-// The Zebra Printer Service was discovered
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
   NSLog(@"did called2");
@@ -496,7 +400,6 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
     if (error) {
         return;
     }
-    
     // Discover the characteristics of Write-To-Printer and Read-From-Printer.
     // Loop through the newly filled peripheral.services array, just in case there's more than one service.
     for (CBService *service in peripheral.services) {
@@ -526,26 +429,21 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
 {
   NSLog(@"didDiscoverCalled1");
     // Deal with errors (if any)
-    if (error) {
-        
+    if (error) {   
         return;
     }
-
     // Again, we loop through the array, as there might be multiple characteristics in service.
     for (CBCharacteristic *characteristic in service.characteristics) {
-        
         // And check if it's the right one
         if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:WRITE_TO_ZPRINTER_CHARACTERISTIC_UUID]]) {
-            
             NSLog(@"write characteristic called:");
             // WRITE_TO_ZPRINTER_CHARACTERISTIC_UUID is a write-only characteristic
-            
             // Notify that Write Characteristic has been discovered through the Notification Center
             [[NSNotificationCenter defaultCenter] postNotificationName:ZPRINTER_WRITE_NOTIFICATION object:self userInfo:@{@"Characteristic":characteristic}];
             
         //   NSString * zpl=@"CT~~CD,~CC^~CT~^XA^MMT^PW734^LL1231^LS0^FO0,768^GFA,38272,38272,00092,:Z64:\neJzs0aERADAIADEG6/AM1rvWIjAIXH6AmI+QJEmSVHtrXXZj59rJw2az2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZo/sDwAA///t3SEBAAAAwrD+rQmARrEHWIWz2Ww2m81ms7/s5ced3bYkSZK+CxLzLNk=:2676^FO544,384^GFA,08448,08448,00024,:Z64:\neJzt2bENACAMA8F0LMVwDI4EC6SJFKjuy2s8gCOk/sbJ2n2+stXJOeecc84555xzzjnnnHPOOa/4419P+tkF6t+Orw==:613B^FO0,384^GFA,03072,03072,00024,:Z64:\neJxjYBgFo4B88B8reEA18QfYLGUcFR8VHxUfFR8VHxVHFad1fTQKRsFwAgDs9Soi:881A^FO0,64^GFA,11776,11776,00092,:Z64:\neJzt2kENACAQA8HzrxIJOAAB8LqkISGzAubTb6skdVqxJvtij9iSbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2W/s5NeCfdqSJP3SBqioe54=:6F90^FO160,384^GFA,06656,06656,00052,:Z64:\neJzt16ENACAMRNEyAftvxyZgcU1NQ8j7/omTFyFJnzZ2refNKs2fDMMwDMMwDMMwTGK6/lyTkSTp6gCtY7SA:79AF^FO160,160^GFA,13312,13312,00052,:Z64:\neJzt2rENACAMA8F0rM3I2QDECGkiBPf9Fe4dIZ1WrXm7ydL6wTAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzAMwzBfm66/f5d5qw1iM9Ft:54B5^FO0,160^GFA,23552,23552,00092,:Z64:\neJzt3DENACAUQ8EvDP86EEICAmAiKSz3BNzSvVWSbpqxBvtg99iSjc1ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2Ww2m81ms9lsNpvNZn+wk3+m7N3W2xZx7Nny:39B6^FO0,448^GFA,13824,13824,00072,:Z64:\neJzt2jENADAMA8EwKH+WZdBS6OBIVXQP4AbPrpIkSertJBrs7MDGi8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw3l0Uj/Yqc5vXbfZvV8=:185D^FO0,608^GFA,09216,09216,00072,:Z64:\neJzt2DEVACAMQ8Fu2EYqTkBEs9B3X8ANGVMlSZK63UR7rnMCGy8Oh8PhcDgcDofD4XA4HA7nUyf1s011JElSvwcBgIlT:9B3D^FO0,704^GFA,11776,11776,00092,:Z64:\neJzt2aERACAQA8Evm7KRODA4sBE/s1fAmshU9WzHWuyPPWNLDjabzWaz2Ww2m81ms9lsNpvNZrPZbDabzWaz2ddOfv/s15YkSZI6dgABKlDe:FE9A^FO352,64^GFA,06144,06144,00048,:Z64:\neJzt10uOnDAQBmBbLFhyBF8kCleaZRZRY2kOkqPEN8gVmBuQnaVBVOovmzYPQyCaTtIS1sht4IP2YLvKrdRVnqxUdLj0l7/8v/WqUc38mKsWrjzuHVxx3NuTXp3zw0nvH+zbB3v7WB9e5+O8//veq7ESP6ga1lbiu7W3ymCWl9G3aOG54t3KDzjiSkdv0cKw1jT2zk+9B0U3G/GDtPDcyqnQtblHDxtUtfheWlglZd6jhzVmlRHfSQvfUuQ9Johx0oZvpYWLOu/xYXBTKd5Jq0teBiH5QWmvaqVwLniyBfvKFhue+3HjR1ot3pbUFvw6yZdZ3/M5h6pT4vmU1+Q09VXWez7+2cvJ4Gu+Qo7HmN9XTRlP9I6qF32TGSSz51uMV3PfYfS5B6ym3sT5ufbcDBW/pUZ9jfO03vItZmOHyorXR7xU1oze3sLMzHosAalc8p8P+y9F8PRR3i28LL89b4TKTXf/6azXf+qxMNQzebx/6n/jWzMbL8zoTZ8Z37Uvd+fDGa+Db+a+2p3/Ex/HN3lZWov1SLRcX83u+t316/hAP1bxgbbjDz/5VeLP9w3f0Ns0vnHw12N8+wDfM3BS3eMt4ifibfJl8gPyBOK5ivEcwZ+zTNOVyZvkOb90yBcvKV/wH+cLOc54jPgkH7VqzK86+XrpnRrzHTJXEfJd3uOBk3zq5Zskn+Z9Jl+HrJn+33eaeNkP4CDuH+ROZHGT94Ps1mULEvcbGJ027CfGSTTx/CiDatw6dbiTr2qal7RfwpX+fjnul9zyp8cT/N65/OX/L3+Vq1zlKtnyC7+HEQk=:C478^BY4,3,160^FT50,1068^BCN,,Y,N^FD>;8900>60JX>553713012^FS^FT31,390^A0N,51,50^FH\^FDNRHT^FS^FT193,455^A0N,28,28^FH\^FDNN4 5EL^FS^FT96,764^A0N,28,28^FH\^FDStorekeeper instruction: GIVE TO DRIVER^FS^FT578,668^A0N,51,50^FH\^FD72 HR^FS^FT94,682^A0N,28,28^FH\^FDParcel label for ECPABCDEFGH^FS^FT33,439^A0N,20,19^FH\^FDCreation Date: ^FS^FT33,463^A0N,20,19^FH\^FD06-06-2019^FS^FT589,556^A0N,102,100^FH\^FD72^FS^FT560,328^A0N,102,100^FH\^FD02A^FS^FT93,517^A0N,25,24^FH\^FDClick & Collect your online purchases ^FS^FT93,548^A0N,25,24^FH\^FD      to your local Collect+ store^FS^FT93,610^A0N,25,24^FH\^FDwww.collectplus.co.uk/services^FS^FT42,303^A0N,102,100^FH\^FD12^FS^FT190,225^A0N,28,28^FH\^FDJohn Lewis^FS^FT190,259^A0N,28,28^FH\^FDClipper Logistics^FS^FT190,293^A0N,28,28^FH\^FDUnit 1, Saxon Avenue,^FS^FT190,327^A0N,28,28^FH\^FDGrange Park^FS^FT190,361^A0N,28,28^FH\^FDNorthampton^FS^FT190,395^A0N,28,28^FH\^FDNorthamptonshire^FS^PQ1,0,1,Y^XZ";
-        _writeCharacteristic=characteristic;
-        self.writeCharacteristic=characteristic;
+        _writeCharacteristic = characteristic;
+        self.writeCharacteristic = characteristic;
         NSLog(@"write characteristic: %@ %@",self.writeCharacteristic,_writeCharacteristic);
             
         } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:READ_FROM_ZPRINTER_CHARACTERISTIC_UUID]]) {
@@ -663,17 +561,14 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
         NSLog(@"Error changing notification state: %@", error.localizedDescription);
         return;
     }
-    
     // Exit if it's not the TRANSFER_CHARACTERISTIC_UUID characteristic, as it's our only interest at this time.
     if (![characteristic.UUID isEqual:[CBUUID UUIDWithString:READ_FROM_ZPRINTER_CHARACTERISTIC_UUID]]) {
         return;
     }
-    
     // Notification has started
     if (characteristic.isNotifying) {
         NSLog(@"Notification began on %@", characteristic);
     }
-    
     // Notification has stopped
     else {
         // so disconnect from the peripheral
