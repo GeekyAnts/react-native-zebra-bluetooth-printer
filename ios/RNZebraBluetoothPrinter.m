@@ -162,8 +162,11 @@ RCT_EXPORT_METHOD(disableBluetooth:(RCTPromiseResolveBlock)resolve
 {
     resolve(nil);
 }
-
-
+RCT_EXPORT_METHOD(pairedDevices:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve(nil);
+}
 //scanDevices
 RCT_EXPORT_METHOD(scanDevices:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
