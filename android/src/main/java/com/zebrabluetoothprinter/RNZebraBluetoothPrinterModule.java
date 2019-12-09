@@ -258,7 +258,6 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
           info.put("class", bluetoothClass.getDeviceClass()); // 1664
           info.put("name", bt.getName());
           info.put("type", "paired");
-        
           // deviceAddress.add(bt.getAddress());
           app_list.pushString(info.toString());
         }
@@ -323,9 +322,8 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
           JSONObject result = null;
           try {
             result = new JSONObject();
-            result.put("paired", pairedDeivce);
             result.put("found", foundDevice);
-            promise.resolve(result.toString());
+            promise.resolve(result);
           } catch (Exception e) {
             // ignore
           }
