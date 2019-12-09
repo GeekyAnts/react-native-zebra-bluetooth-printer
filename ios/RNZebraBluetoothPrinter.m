@@ -117,8 +117,6 @@ do {
                     length:thisChunkSize  freeWhenDone:NO];
                     offset += thisChunkSize;
     [self.printer writeValue:chunk forCharacteristic:self.writeCharacteristic type:CBCharacteristicWriteWithResponse];
- 
-
 } while (offset < length);
  
   printCompleted=YES; 
@@ -163,12 +161,7 @@ RCT_EXPORT_METHOD(scanDevices:(RCTPromiseResolveBlock)resolve
 {
 
     @try{
-        CBUUID *deviceInfoUUID = [CBUUID UUIDWithString: @"0C347F9F-2881-9CCB-43B0-205976944626"];
-         NSArray<CBPeripheral*> *connectedDevices=[self.centralManager retrieveConnectedPeripheralsWithServices:@[deviceInfoUUID]];
-         NSLog(@"arrayOf %d",[connectedDevices count]);
-     for(CBPeripheral *p in connectedDevices) {
-          NSLog(@"ggg");
-        }
+       
         if (!self.centralManager || self.centralManager.state!=CBManagerStatePoweredOn) {
             reject(@"BLUETOOTCH_INVALID_STATE",@"BLUETOOTCH_INVALID_STATE",nil);
             return;
@@ -178,8 +171,6 @@ RCT_EXPORT_METHOD(scanDevices:(RCTPromiseResolveBlock)resolve
         }
         self.scanResolveBlock = resolve;
         self.scanRejectBlock = reject;
-        NSLog(@"devices:");
-        NSLog(@"connectedValue %@",connected);
         if (connected && connected.identifier) {
             NSLog(@"values%@",connected);
             BOOL state= connected.state;
@@ -431,8 +422,6 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
     NSString *pId = peripheral.identifier.UUIDString;
     if(_waitingConnect && [_waitingConnect isEqualToString: pId] && self.connectResolveBlock){
         NSLog(@"Predefined the support services, stop to looking up services.");
-      //  peripheral.delegate=self;
-//        [peripheral discoverServices:nil];
         self.connectResolveBlock(nil);
         _waitingConnect = nil;
         self.connectRejectBlock = nil;
@@ -613,12 +602,10 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
         self.printResolveBlock=nil;
       }
         if (writeDataDelegate) {
-
             [writeDataDelegate didWriteDataToBle:false];
         }
     }
-    else
-    {
+    else {
         NSLog(@"print resolved");
         _printerSuccess=true;
         self.printerSuccess=true;
