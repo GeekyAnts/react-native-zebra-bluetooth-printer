@@ -55,15 +55,17 @@ RNZebraBluetoothPrinter.isEnabledBluetooth().then((res)=>{
 ```
 2. enableBluetooth == > async function,
 	 Android: requests for bluetooth on/off permission on the android device.
-	 iOS: requests the user to go to settings and enable bluetooth as iOS doesn't give direct permission to access bluetooth.
+	 iOS: resolves to nil.
+
 ```javascript
 RNZebraBluetoothPrinter.enableBluetooth().then((res)=>{
 	//do something with res
 })
 ```
+
 3. disableBluetooth == > async function,
 	Android: disables bluetooth if bluetooth is switched on.
-	iOS: simply resolves by nil.
+	iOS: simply resolves by nil.	
 ```javascript
 RNZebraBluetoothPrinter.disableBluetooth().then((res)=>{
 	//do something with res
@@ -83,7 +85,13 @@ RNZebraBluetoothPrinter.pairedDevices().then((deviceArray)=>{
 	//do something with deviceArray
 })
 ```	
-6. unpairDevice == > async function,
+6. connectDevice == > async function,
+```javascript
+RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res)=>{
+	//do something with res
+})
+```	
+7. unpairDevice == > async function,
 	Android: unpair/disconnect a paired device from paired device list.
 	iOS:
 ```javascript
@@ -91,7 +99,7 @@ RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((deviceArray)=>{
 	//do something with deviceArray
 })
 ```		
-7. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.	
+8. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.	
 # Android
 ```javascript
 RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((deviceArray)=>{

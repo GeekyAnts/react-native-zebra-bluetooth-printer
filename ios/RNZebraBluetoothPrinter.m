@@ -150,6 +150,12 @@ RCT_EXPORT_METHOD(enableBluetooth:(RCTPromiseResolveBlock)resolve
 {
     resolve(nil);
 }
+RCT_EXPORT_METHOD(unpairDevice:(NSString*)address
+                 findEventsWithResolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) 
+{
+resolve(nil);
+}
 //disableBluetooth
 RCT_EXPORT_METHOD(disableBluetooth:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
