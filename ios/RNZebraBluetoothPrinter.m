@@ -6,12 +6,6 @@
 #import "React/RCTEventDispatcher.h"
     
 @implementation RNZebraBluetoothPrinter;
-NSString *EVENT_DEVICE_ALREADY_PAIRED = @"EVENT_DEVICE_ALREADY_PAIRED";
-NSString *EVENT_DEVICE_DISCOVER_DONE = @"EVENT_DEVICE_DISCOVER_DONE";
-NSString *EVENT_DEVICE_FOUND = @"EVENT_DEVICE_FOUND";
-NSString *EVENT_CONNECTION_LOST = @"EVENT_CONNECTION_LOST";
-NSString *EVENT_UNABLE_CONNECT=@"EVENT_UNABLE_CONNECT";
-NSString *EVENT_CONNECTED=@"EVENT_CONNECTED";
 
 static NSArray<CBUUID *> *supportServices = nil;
 static NSDictionary *writeableCharactiscs = nil;
@@ -102,9 +96,6 @@ RCT_EXPORT_MODULE();
              EVENT_DEVICE_ALREADY_PAIRED];
 }
 
-
-
-
 RCT_EXPORT_METHOD(print:(NSString*)zpl
                   zplArrayLength:(NSUInteger*)zplArrayLength
                   index:(NSUInteger*)index
@@ -162,6 +153,7 @@ RCT_EXPORT_METHOD(disableBluetooth:(RCTPromiseResolveBlock)resolve
 {
     resolve(nil);
 }
+// find paired Devices
 RCT_EXPORT_METHOD(pairedDevices:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -451,7 +443,7 @@ RCT_EXPORT_METHOD(connectDevice:(NSString *)address
     }
     peripheral.delegate=self;
     _printer=peripheral;
-    self.printer=peripheral;
+    self.printer=peripheral;    
        NSLog(@"going to emit EVENT_CONNECTED.");
         [peripheral discoverServices:@[[CBUUID UUIDWithString:ZPRINTER_SERVICE_UUID], [CBUUID UUIDWithString:ZPRINTER_DIS_SERVICE]]];
     if (hasListeners) {

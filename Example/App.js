@@ -70,7 +70,7 @@ const App: () => React$Node = () => {
             <TouchableOpacity
               onPress={() => {
                 NativeModules.RNZebraBluetoothPrinter.scanDevices().then(res => {
-                  console.log(res);
+                  console.log(JSON.parse(res.found));
                 });
               }}
             ><Text>
@@ -78,7 +78,7 @@ const App: () => React$Node = () => {
               </Text></TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                NativeModules.RNZebraBluetoothPrinter.connectDevice("38:F9:D3:AB:72:3E").then(res => {
+                NativeModules.RNZebraBluetoothPrinter.connectDevice("0C347F9F-2881-9CCB-43B0-205976944626").then(res => {
                   Alert.alert(res);
                 });
               }}
