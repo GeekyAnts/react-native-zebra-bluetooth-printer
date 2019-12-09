@@ -97,8 +97,6 @@ RCT_EXPORT_MODULE();
 }
 
 RCT_EXPORT_METHOD(print:(NSString*)zpl
-                  zplArrayLength:(NSUInteger*)zplArrayLength
-                  index:(NSUInteger*)index
                   findEventsWithResolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {

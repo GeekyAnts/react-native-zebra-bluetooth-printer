@@ -16,7 +16,8 @@ import {
   StatusBar,
   TouchableOpacity,
   NativeModules,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
 
 import {
@@ -29,7 +30,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
 // import RNZebraBluetoothPrinter from './node_modules/react-native-zebra-bluetooth-printer';
-const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS^ XZ";
+const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS ^XZ";
 const App: () => React$Node = () => {
   console.log(NativeModules,RNZebraBluetoothPrinter);
   // NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
@@ -51,7 +52,7 @@ const App: () => React$Node = () => {
           <View style={styles.body}>
             <TouchableOpacity 
             onPress={()=>{
-              NativeModules.RNZebraBluetoothPrinter.disableBluetooth().then(res=>{
+              NativeModules.RNZebraBluetoothPrinter.disableBluetooth().then(res=>{  
               console.log(res);
               });
             }}
@@ -96,9 +97,18 @@ const App: () => React$Node = () => {
               </Text></TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                NativeModules.RNZebraBluetoothPrinter.print("AC:3F:A4:AF:36:17",zpl,true).then(res => {
-                 console.log(res);
-                });
+                if(Platform.OS == 'ios') {
+                  NativeModules.RNZebraBluetoothPrinter.print(zpl).then(res => {
+                    console.log(res);
+                  });
+                }
+                else {
+                  NativeModules.RNZebraBluetoothPrinter.print("AC:3F:A4:AF:36:17", zpl).then(res => {
+
+                    console.log(res);
+                  });
+                }
+              
               }}
             ><Text>
                Print Zpl
