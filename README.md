@@ -44,8 +44,6 @@ It includes features like bluetooth enable/disable, pair/unpair a BLE/Bluetooth 
 ```javascript
 import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
 
-// TODO: What to do with the module?
-RNZebraBluetoothPrinter;
 ```
 1. isEnabledBluetooth == > async function, check the status of bluetooth service in the bluetooth client(mobile phone) .Returns true if already enabled, false if not enabled.
 ```javascript
@@ -95,20 +93,20 @@ RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res) => {
 ```	
 7. unpairDevice == > async function,
 	Android: unpair/disconnect a paired device from paired device list.
-	iOS:
 ```javascript
 RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((deviceArray) => {
 	//do something with deviceArray
 })
-```		
+```
+	iOS: function resolves to nil.		
 8. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.	
-#### Android
+Android
 ```javascript
 RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((deviceArray) => {
 	//do something with res
 })
 ```
-#### iOS
+iOS
 ```javascript
 RNZebraBluetoothPrinter.print(zpl).then((deviceArray)=>{
 	//do something with res
