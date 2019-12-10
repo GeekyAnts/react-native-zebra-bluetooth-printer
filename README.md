@@ -100,6 +100,11 @@ RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((deviceArray) => {
 ```
 	iOS: function resolves to nil.		
 8. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.	
+For example :
+```javascript
+const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS ^XZ";
+
+```
 Android
 ```javascript
 RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((deviceArray) => {
