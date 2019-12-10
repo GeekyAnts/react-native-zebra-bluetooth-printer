@@ -49,7 +49,7 @@ RNZebraBluetoothPrinter;
 ```
 1. isEnabledBluetooth == > async function, check the status of bluetooth service in the bluetooth client(mobile phone) .Returns true if already enabled, false if not enabled.
 ```javascript
-RNZebraBluetoothPrinter.isEnabledBluetooth().then((res)=>{
+RNZebraBluetoothPrinter.isEnabledBluetooth().then((res) => {
 	//do something with res
 })
 ```
@@ -58,7 +58,7 @@ RNZebraBluetoothPrinter.isEnabledBluetooth().then((res)=>{
 	 iOS: resolves to nil.
 
 ```javascript
-RNZebraBluetoothPrinter.enableBluetooth().then((res)=>{
+RNZebraBluetoothPrinter.enableBluetooth().then((res) => {
 	//do something with res
 })
 ```
@@ -67,13 +67,13 @@ RNZebraBluetoothPrinter.enableBluetooth().then((res)=>{
 	Android: disables bluetooth if bluetooth is switched on.
 	iOS: simply resolves by nil.	
 ```javascript
-RNZebraBluetoothPrinter.disableBluetooth().then((res)=>{
+RNZebraBluetoothPrinter.disableBluetooth().then((res) => {
 	//do something with res
 })
 ```	
 4. scanDevices == > async function, scans for available nearby bluetooth devices for a specific period of time.
 ```javascript
-RNZebraBluetoothPrinter.scanDevices().then((deviceArray)=>{
+RNZebraBluetoothPrinter.scanDevices().then((deviceArray) => {
 	//do something with res
 })
 ```	
@@ -81,29 +81,37 @@ RNZebraBluetoothPrinter.scanDevices().then((deviceArray)=>{
 	Android: returns already paired devices.
 	iOS: resolves to nil.
 ```javascript
-RNZebraBluetoothPrinter.pairedDevices().then((deviceArray)=>{
+RNZebraBluetoothPrinter.pairedDevices().then((deviceArray) => {
 	//do something with deviceArray
 })
 ```	
 6. connectDevice == > async function,
 ```javascript
-RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res)=>{
+RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res) => {
 	//do something with res
+	//for android, device address is mac address
+	//for iOS, device address is a long string like 0C347F9F-2881-9CCB-43B0-205976944626
 })
 ```	
 7. unpairDevice == > async function,
 	Android: unpair/disconnect a paired device from paired device list.
 	iOS:
 ```javascript
-RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((deviceArray)=>{
+RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((deviceArray) => {
 	//do something with deviceArray
 })
 ```		
 8. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.	
-# Android
+#### Android
 ```javascript
-RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((deviceArray)=>{
+RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((deviceArray) => {
 	//do something with res
 })
-```		
+```
+#### iOS
+```javascript
+RNZebraBluetoothPrinter.print(zpl).then((deviceArray)=>{
+	//do something with res
+})
+```	
   
