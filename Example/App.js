@@ -27,12 +27,12 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import DeviceInfo from 'react-native-device-info';
-import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
+
+// import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
 // import RNZebraBluetoothPrinter from './node_modules/react-native-zebra-bluetooth-printer';
 const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS ^XZ";
 const App: () => React$Node = () => {
-  console.log(NativeModules,RNZebraBluetoothPrinter);
+  console.log(NativeModules);
   // NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
   //   console.log(res);
   // });
@@ -50,6 +50,15 @@ const App: () => React$Node = () => {
             </View>
           )}
           <View style={styles.body}>
+            <TouchableOpacity
+              onPress={() => {
+                NativeModules.RNZebraBluetoothPrinter.enableBluetooth().then(res => {
+                  console.log(res);
+                });
+              }}
+            ><Text>
+                Press to Enable
+              </Text></TouchableOpacity>
             <TouchableOpacity 
             onPress={()=>{
               NativeModules.RNZebraBluetoothPrinter.disableBluetooth().then(res=>{  

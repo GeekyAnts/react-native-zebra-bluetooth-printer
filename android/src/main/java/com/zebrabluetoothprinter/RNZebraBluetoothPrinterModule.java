@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothClass;
 import com.facebook.react.bridge.UiThreadUtil;
 import android.content.Context;
 import android.content.Intent;
+import java.util.Iterator;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -27,7 +28,6 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.facebook.react.uimanager.IllegalViewOperationException;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.zebra.sdk.comm.BluetoothConnection;                                  // using zebra sdk for print functionality
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.printer.PrinterStatus;
@@ -94,46 +95,49 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     this.bluetoothAdapter = this.bluetoothManager.getAdapter();
   }
   
-
   public RNZebraBluetoothPrinterModule(ReactApplicationContext reactContext,BluetoothService bluetoothService) {                  // Constructor
-    super(reactContext);
-    this.reactContext = reactContext;
-    context = getReactApplicationContext();
-    this.getBluetoothManagerInstance(context);
-    this.mService = bluetoothService;
-    this.mService.addStateObserver(this);
-    IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-    filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-    this.reactContext.registerReceiver(discoverReceiver, filter);
+        super(reactContext);
+        this.reactContext = reactContext;
+        context = getReactApplicationContext();
+        this.getBluetoothManagerInstance(context);
+        this.mService = bluetoothService;
+        this.mService.addStateObserver(this);
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        this.reactContext.registerReceiver(discoverReceiver, filter);
   }
 
   private void cancelDiscovery() {
-    try {
-      BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
-      if (adapter != null && adapter.isDiscovering()) {
-        adapter.cancelDiscovery();
-      }
-      Log.d(TAG, "Discover canceled");
-    } catch (Exception e) {
-      // ignore
-    }
+        try {
+          BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
+          if (adapter != null && adapter.isDiscovering()) {
+            adapter.cancelDiscovery();
+          }
+          Log.d(TAG, "Discover canceled");
+        } catch (Exception e) {
+          // ignore
+        }
   }
   
-
   @Override
   public String getName() {
-    return "RNZebraBluetoothPrinter";
+        return "RNZebraBluetoothPrinter";
   }
   
   private void emitRNEvent(String event, @Nullable WritableMap params) {                                                          // emit events to JavaScript        
-    getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(event, params);
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(event, params);
   }
-
 
   @ReactMethod
-  public void enableBluetooth() {                                                                                       //enable bluetooth
-   this.reactContext.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),1,null);
+  public void enableBluetooth(final Promise promise) {
+        try{
+        this.reactContext.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1, null);
+        promise.resolve("enabled");
+        }catch(Exception e) {
+          promise.reject(e);
+        }                                                                                       //enable bluetooth
   }
+
   @ReactMethod
   public void isEnabledBluetooth(final Promise promise) {                                                     //check if the bluetooth is enabled or not
     
@@ -147,26 +151,29 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
 
   @ReactMethod 
   public void scanDevices(final Promise promise) {                                                    //scan for unpaired devices
-    if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+    if(this.bluetoothAdapter == null || !this.bluetoothAdapter.isEnabled()) {
       promise.reject("BT NOT ENABLED");
     } else {
       cancelDiscovery();
       int permissionChecked = ContextCompat.checkSelfPermission(reactContext,
           android.Manifest.permission.ACCESS_COARSE_LOCATION);
+   
       if (permissionChecked == PackageManager.PERMISSION_DENIED) {
-    
+     
         ActivityCompat.requestPermissions(reactContext.getCurrentActivity(),
             new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, 1);
       }
-      if (!bluetoothAdapter.startDiscovery()) {
+   
+      if (!this.bluetoothAdapter.startDiscovery()) {
+
         promise.reject("DISCOVER", "NOT_STARTED");
         cancelDiscovery();
       } else {
         promiseMap.put(PROMISE_SCAN, promise);
       }
-
     }
   }
+
   @ReactMethod
   public void disableBluetooth(final Promise promise) {                                           // disable bluetooth
     if( bluetoothAdapter == null ) {    // bluetooth already disabled
@@ -177,6 +184,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       promise.resolve(true);
     }
   }
+
   @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
@@ -237,6 +245,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public void onNewIntent(Intent intent) {
 
   }
+
   @ReactMethod
   public void pairedDevices(final Promise promise) {
     this.context = getCurrentActivity();
@@ -245,29 +254,28 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     }
     else {
           Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-             List<String> deviceName = new ArrayList<String>();
+            List<String> deviceName = new ArrayList<String>();
             List<String> deviceAddress = new ArrayList<String>();
             List<Integer> ble = new ArrayList<Integer>();
           try {
-      
-        WritableArray app_list = Arguments.createArray();
+        WritableArray app_list = new WritableNativeArray();
         for (BluetoothDevice bt : pairedDevices) {
           BluetoothClass bluetoothClass = bt.getBluetoothClass();    // get class of bluetooth device
-         JSONObject info = new JSONObject();
-          info.put("address", bt.getAddress());
-          info.put("class", bluetoothClass.getDeviceClass()); // 1664
-          info.put("name", bt.getName());
-          info.put("type", "paired");
-          // deviceAddress.add(bt.getAddress());
-          app_list.pushString(info.toString());
+        WritableMap info = new WritableNativeMap();
+            info.putString("address", bt.getAddress());
+                info.putDouble("class", bluetoothClass.getDeviceClass()); //1664
+                info.putString("name",bt.getName());
+                info.putString("type","paired");
+                 app_list.pushMap(info);
         }
-      promise.resolve(app_list.toString());
-      } catch (JSONException e) {
+      promise.resolve(app_list);
+      } catch (Exception e) {
         promise.reject(E_LAYOUT_ERROR, e);
       }
      
     }
   }
+
   @ReactMethod
   public void unpairDevice(String deviceAddress,final Promise promise) {
       BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
@@ -322,8 +330,9 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
           JSONObject result = null;
           try {
             result = new JSONObject();
+            result.put("paired", pairedDeivce);
             result.put("found", foundDevice);
-            promise.resolve(result);
+            promise.resolve(result.toString());
           } catch (Exception e) {
             // ignore
           }
@@ -353,6 +362,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     }
     return found;
   }
+
   @ReactMethod
   public void connectDevice(String address,final Promise promise) {
     BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
@@ -406,6 +416,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     }
     return configLabel;
   }
+  
   @ReactMethod
   public void print(String device, String label,final Promise promise) {
     boolean success = false;

@@ -37,7 +37,7 @@ target 'Example' do
 
 
 
-  pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
+
 
 
   target 'ExampleTests' do
