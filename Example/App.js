@@ -6,7 +6,7 @@
  * @flow
  */
 
-import React from 'react';
+import React,{useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -17,7 +17,9 @@ import {
   TouchableOpacity,
   NativeModules,
   Alert,
-  Platform
+  Platform,
+  Button,
+  ActivityIndicator
 } from 'react-native';
 
 import {
@@ -32,84 +34,89 @@ import {
 // import RNZebraBluetoothPrinter from './node_modules/react-native-zebra-bluetooth-printer';
 const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS ^XZ";
 const App: () => React$Node = () => {
-
+const [devices,setDeviceArray] = useState([]);
+const [loading,toggleLoading] = useState(false);
   return (
     <>
-      <StatusBar barStyle="dark-content" />
+
       <SafeAreaView>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
+            <View style={{
+            flexDirection: 'row',
+            justifyContent: 'center'
+            }}>
+              <Text style={{
+                fontSize:30,
+               
+              }}>Demo App</Text>
             </View>
-          )}
           <View style={styles.body}>
-            <TouchableOpacity
+            <Button
+              title="enable BT"
               onPress={() => {
                 NativeModules.RNZebraBluetoothPrinter.enableBluetooth().then(res => {
                   console.log(res);
                 });
               }}
-            ><Text>
-                Press to Enable
-              </Text></TouchableOpacity>
-            <TouchableOpacity 
+            ></Button>
+            <Button
+            title="disable BT"
             onPress={()=>{
               NativeModules.RNZebraBluetoothPrinter.disableBluetooth().then(res=>{  
               console.log(res);
               });
             }}
-            ><Text>
-              Press to Disable
-              </Text></TouchableOpacity>
-            <TouchableOpacity
+            ></Button>
+            </View>
+          <View>
+            <Button
+            title="Paired devices"
               onPress={() => {
+                toggleLoading(true);
                 NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
-                console.log(res);
+                  setDeviceArray(res);
+                  toggleLoading(false);
                 });
               }}
-            ><Text>
-                Get paired Devices
-              </Text></TouchableOpacity>
-            <TouchableOpacity
+            ></Button>
+            <View style={{padding:10}}></View>
+            <Button
+            title="Unpaired devices"
               onPress={() => {
-                NativeModules.RNZebraBluetoothPrinter.scanDevices().then(res => {
-                 console.log(res);
-                });
+                toggleLoading(true);
+             
+                  NativeModules.RNZebraBluetoothPrinter.scanDevices().then(res => {
+                    console.log(res);
+                    if(Platform.OS == 'ios') {
+                      var found = JSON.parse(res.found);  //filter array for printers [class:1664]
+                    }
+                    else {
+                      var devices = JSON.parse(res);
+                      var found = devices.found;
+                    }
+                   
+                    setDeviceArray(found); 
+                    toggleLoading(false);
+                  });
+               
               }}
-            ><Text>
-                Get unpaired Devices
-              </Text></TouchableOpacity>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
+            ></Button>
           </View>
+          {loading == true ?<ActivityIndicator/>:<ScrollView>
+            {devices.map((device)=>{
+              return(
+                <View style={{
+                  flexDirection:'row',
+                  justifyContent:'space-evenly'
+                }}>
+                  <Text>{device.name}</Text>
+                  <Text>{device.address}</Text>
+                </View>
+              )
+            })}
+          </ScrollView>}
         </ScrollView>
       </SafeAreaView>
     </>
@@ -126,6 +133,9 @@ const styles = StyleSheet.create({
   },
   body: {
     backgroundColor: Colors.white,
+    padding:30,
+    flexDirection:'row',
+    justifyContent:'space-evenly'
   },
   sectionContainer: {
     marginTop: 32,
