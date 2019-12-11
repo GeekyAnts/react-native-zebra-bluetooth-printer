@@ -32,10 +32,7 @@ import {
 // import RNZebraBluetoothPrinter from './node_modules/react-native-zebra-bluetooth-printer';
 const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS ^XZ";
 const App: () => React$Node = () => {
-  console.log(NativeModules);
-  // NativeModules.RNZebraBluetoothPrinter.isEnabledBluetooth().then(res=>{
-  //   console.log(res);
-  // });
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -85,42 +82,6 @@ const App: () => React$Node = () => {
               }}
             ><Text>
                 Get unpaired Devices
-              </Text></TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                NativeModules.RNZebraBluetoothPrinter.connectDevice("0C347F9F-2881-9CCB-43B0-205976944626").then(res => {
-                  Alert.alert(res);
-                });
-              }}
-            ><Text>
-               connect to printer
-              </Text></TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                NativeModules.RNZebraBluetoothPrinter.unpairDevice("38:F9:D3:AB:72:3E").then(res => {
-                  Alert.alert(res);
-                });
-              }}
-            ><Text>
-                disconnect to device
-              </Text></TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                if(Platform.OS == 'ios') {
-                  NativeModules.RNZebraBluetoothPrinter.print(zpl).then(res => {
-                    console.log(res);
-                  });
-                }
-                else {
-                  NativeModules.RNZebraBluetoothPrinter.print("AC:3F:A4:AF:36:17", zpl).then(res => {
-
-                    console.log(res);
-                  });
-                }
-              
-              }}
-            ><Text>
-               Print Zpl
               </Text></TouchableOpacity>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>
