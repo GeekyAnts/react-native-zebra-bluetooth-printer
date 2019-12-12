@@ -9,8 +9,9 @@ Pod::Spec.new do |s|
                   RNZebraBluetoothPrinter
                    DESC
   s.homepage     = "https://github.com/anmoljain10/react-native-zebra-bluetooth-printer.git"
-  # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
-  s.author             = { "author" => "author@domain.cn" }
+  s.authors             = { "Aditya Kumar" => "adityak@geekyants.com",
+                            "Anmol Jain"  =>"anmol@geekyants.com"
+                           }
   s.platform     = :ios, "9.0"
   s.source       = { :git => "https://github.com/anmoljain10/react-native-zebra-bluetooth-printer.git", :tag => "#{s.version}" }
   s.source_files = "ios/**/*.{h,m,swift}"

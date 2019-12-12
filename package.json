@@ -1,6 +1,6 @@
 {
   "name": "react-native-zebra-bluetooth-printer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,9 +8,10 @@
   },
   "keywords": [
     "react-native",
-    "Core-bluetooth",
+    "CoreBluetooth",
     "zebra-printers",
-    "BLE"
+    "BLE",
+    "react-native-zebra-bluetooth-printer"
   ],
   "author": "",
   "license": "",

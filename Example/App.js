@@ -76,7 +76,7 @@ const [loading,toggleLoading] = useState(false);
               onPress={() => {
                 toggleLoading(true);
                 NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
-                  setDeviceArray(res);
+                  setDeviceArray(res);                       //filter array for printers [class:1664]
                   toggleLoading(false);
                 });
               }}
@@ -86,7 +86,6 @@ const [loading,toggleLoading] = useState(false);
             title="Unpaired devices"
               onPress={() => {
                 toggleLoading(true);
-             
                   NativeModules.RNZebraBluetoothPrinter.scanDevices().then(res => {
                     console.log(res);
                     if(Platform.OS == 'ios') {
@@ -113,6 +112,10 @@ const [loading,toggleLoading] = useState(false);
                 }}>
                   <Text>{device.name}</Text>
                   <Text>{device.address}</Text>
+                  <TouchableOpacity onPress={()=>{
+                    NativeModules.RNZebraBluetoothPrinter.connectDevice(device.address).then(res=>alert(res));
+                  }}><Text>Connect</Text>
+                  </TouchableOpacity>
                 </View>
               )
             })}
