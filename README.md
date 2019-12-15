@@ -34,7 +34,12 @@
       compile project(':react-native-zebra-bluetooth-printer')
   	```
 
-
+### Update Android Manifest
+```
+ <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+```
 ## Usage
 
 # RNZebraBluetoothPrinter

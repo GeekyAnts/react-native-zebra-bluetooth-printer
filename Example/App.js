@@ -19,7 +19,8 @@ import {
   Alert,
   Platform,
   Button,
-  ActivityIndicator
+  ActivityIndicator,
+  Flatlist
 } from 'react-native';
 
 import {
@@ -36,9 +37,9 @@ const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50
 const App: () => React$Node = () => {
 const [devices,setDeviceArray] = useState([]);
 const [loading,toggleLoading] = useState(false);
+const [deviceType,setDeviceType] = useState('');
   return (
-    <>
-
+   
       <SafeAreaView>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
@@ -76,7 +77,8 @@ const [loading,toggleLoading] = useState(false);
               onPress={() => {
                 toggleLoading(true);
                 NativeModules.RNZebraBluetoothPrinter.pairedDevices().then(res => {
-                  setDeviceArray(res);                       //filter array for printers [class:1664]
+                  setDeviceArray(res); 
+                  setDeviceType('paired');                      //filter array for printers [class:1664]
                   toggleLoading(false);
                 });
               }}
@@ -95,7 +97,7 @@ const [loading,toggleLoading] = useState(false);
                       var devices = JSON.parse(res);
                       var found = devices.found;
                     }
-                   
+                    setDeviceType(''); 
                     setDeviceArray(found); 
                     toggleLoading(false);
                   });
@@ -103,26 +105,38 @@ const [loading,toggleLoading] = useState(false);
               }}
             ></Button>
           </View>
-          {loading == true ?<ActivityIndicator/>:<ScrollView>
-            {devices.map((device)=>{
-              return(
+      
+       {
+         loading == true?<ActivityIndicator />:
+         devices.map((device)=>
+           
+            <View style={{
+              flexDirection:'row',
+              padding:20,
+              justifyContent:'center'
+            }}>
                 <View style={{
-                  flexDirection:'row',
-                  justifyContent:'space-evenly'
+                  flex:0.4
                 }}>
                   <Text>{device.name}</Text>
-                  <Text>{device.address}</Text>
-                  <TouchableOpacity onPress={()=>{
-                    NativeModules.RNZebraBluetoothPrinter.connectDevice(device.address).then(res=>alert(res));
-                  }}><Text>Connect</Text>
-                  </TouchableOpacity>
                 </View>
-              )
-            })}
-          </ScrollView>}
-        </ScrollView>
-      </SafeAreaView>
-    </>
+                <View style={{
+                  flex:0.3
+                }}>
+                <Text>{device.address}</Text>
+                </View>
+                {device.type !='paired' &&
+                 <View>
+                   <Button
+                   title="connect"
+                   onClick={()=>{
+                     NativeModules.RNZebraBluetoothPrinter.connect(device.address).then(res=>alert(res));
+                   }}></Button>
+                 </View>}
+            </View>
+         )}
+      </ScrollView>
+      </SafeAreaView> 
   );
 };
 

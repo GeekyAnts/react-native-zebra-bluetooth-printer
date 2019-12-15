@@ -13,7 +13,9 @@
     "BLE",
     "react-native-zebra-bluetooth-printer"
   ],
-  "author": "",
+  "repository": {"type":"git","url": "git+https://github.com/anmoljain10/react-native-zebra-bluetooth-printer"},
+  "author":"Anmol Jain <anmol@geekyants.com>" ,
+  "contributors": ["Aditya Kumar <adityak@geekyants.com>"],
   "license": "",
   "peerDependencies": {
     "react": "^16.8.1",
