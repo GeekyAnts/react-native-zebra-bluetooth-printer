@@ -420,7 +420,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   }
   
   @ReactMethod
-  public void print(String device, String label,final Promise promise) {
+  public void print(String device, String label,final Promise promise) {            //print functionality for zebra printer
     boolean success = false;
     boolean loading = false;
     sleep(500);
