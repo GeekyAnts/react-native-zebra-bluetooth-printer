@@ -1,6 +1,6 @@
 {
   "name": "react-native-zebra-bluetooth-printer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "repository": {"type":"git","url": "git+https://github.com/anmoljain10/react-native-zebra-bluetooth-printer"},
   "author":"Anmol Jain <anmol@geekyants.com>" ,
   "contributors": ["Aditya Kumar <adityak@geekyants.com>"],
-  "license": "",
+  "license": "MIT",
   "peerDependencies": {
     "react": "^16.8.1",
     "react-native": ">=0.59.0-rc.0 <1.0.x"
