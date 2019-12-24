@@ -88,7 +88,7 @@ RNZebraBluetoothPrinter.pairedDevices().then((deviceArray) => {
 	//do something with deviceArray
 })
 ```	
-6. connectDevice == > async function,
+6. connectDevice == > async function, for both android and iOS
 ```javascript
 RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res) => {
 	//do something with res
@@ -99,8 +99,8 @@ RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res) => {
 7. unpairDevice == > async function,
 	Android: unpair/disconnect a paired device from paired device list.
 ```javascript
-RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((deviceArray) => {
-	//do something with deviceArray
+RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((res) => {
+	//do something with res
 })
 ```
 	iOS: function resolves to nil.		
@@ -112,13 +112,13 @@ const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50
 ```
 Android
 ```javascript
-RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((deviceArray) => {
+RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((res) => {
 	//do something with res
 })
 ```
 iOS
 ```javascript
-RNZebraBluetoothPrinter.print(zpl).then((deviceArray)=>{
+RNZebraBluetoothPrinter.print(zpl).then((res)=>{
 	//do something with res
 })
 ```	
