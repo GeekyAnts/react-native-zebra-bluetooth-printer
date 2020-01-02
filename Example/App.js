@@ -130,7 +130,7 @@ const [deviceType,setDeviceType] = useState('');
                    <Button
                    title="connect"
                    onClick={()=>{
-                     NativeModules.RNZebraBluetoothPrinter.connect(device.address).then(res=>alert(res));
+                     NativeModules.RNZebraBluetoothPrinter.connectDevice(device.address).then(res=>alert(res));
                    }}></Button>
                  </View>}
             </View>

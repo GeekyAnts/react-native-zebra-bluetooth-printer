@@ -5,9 +5,13 @@
 
 `$ npm install react-native-zebra-bluetooth-printer --save`
 
+
+
 ### Mostly automatic installation
 
 `$ react-native link react-native-zebra-bluetooth-printer`
+
+Note : For react-native > 0.59, don't use above command it uses auto-linking.
 
 ### Manual installation
 
