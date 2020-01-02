@@ -3,7 +3,7 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 Pod::Spec.new do |s|
   s.name         = "react-native-zebra-bluetooth-printer"
-  s.version      = "1.0.4"
+  s.version      = "1.0.5"
   s.summary      = "RNZebraBluetoothPrinter"
   s.description  = <<-DESC
                   RNZebraBluetoothPrinter
