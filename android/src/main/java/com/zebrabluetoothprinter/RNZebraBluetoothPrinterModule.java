@@ -24,6 +24,7 @@ import com.facebook.react.bridge.*;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableMap;
@@ -421,6 +422,13 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   
   @ReactMethod
   public void print(String device, String label,final Promise promise) {            //print functionality for zebra printer
+    WritableArray labels =Arguments.createArray();
+    labels.pushString(label);
+    printBulk(device, labels, promise);
+  }
+  
+  @ReactMethod
+  public void printBulk(String device, ReadableArray labels,final Promise promise) {
     boolean success = false;
     boolean loading = false;
     sleep(500);
@@ -443,9 +451,12 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
         PrinterStatus status = zebraPrinter.getCurrentStatus();
 
         String pl = SGD.GET("device.languages", connection);
-
-        byte[] configLabel = getConfigLabel(zebraPrinter, label);
-        connection.write(configLabel);
+        
+        byte[] configLabel = null;
+        for (int i = 0; i < labels.size(); i++) {
+          configLabel = getConfigLabel(zebraPrinter, labels.getString(0));
+          connection.write(configLabel);
+        }
         sleep(1500);
         success = true;
         loading = false;
