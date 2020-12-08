@@ -454,7 +454,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
         
         byte[] configLabel = null;
         for (int i = 0; i < labels.size(); i++) {
-          configLabel = getConfigLabel(zebraPrinter, labels.getString(0));
+          configLabel = getConfigLabel(zebraPrinter, labels.getString(i));
           connection.write(configLabel);
         }
         sleep(1500);
