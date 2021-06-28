@@ -422,15 +422,8 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
 
   @ReactMethod
   public void isConnected(Promise promise){
-    try {
-      promise.resolve(connection.isConnected());
-    } catch (ConnectionException e) {
-      Log.d(TAG, e.toString());
-      promise.resolve(false);
-    } catch (ZebraPrinterLanguageUnknownException e){
-      Log.d(TAG, e.toString());
-      promise.resolve(false);
-    }
+    boolean isConnected = connection.isConnected();
+    promise.resolve(isConnected);
   }
 
   @ReactMethod
