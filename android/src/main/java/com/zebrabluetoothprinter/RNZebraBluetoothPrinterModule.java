@@ -47,6 +47,7 @@ import com.zebra.sdk.printer.PrinterLanguage;
 import com.zebra.sdk.printer.SGD;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
+import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
 
 public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule implements ActivityEventListener,BluetoothServiceStateObserver {
@@ -96,46 +97,46 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   }
   
   public RNZebraBluetoothPrinterModule(ReactApplicationContext reactContext,BluetoothService bluetoothService) {                  // Constructor
-        super(reactContext);
-        this.reactContext = reactContext;
-        context = getReactApplicationContext();
-        this.getBluetoothManagerInstance(context);
-        this.mService = bluetoothService;
-        this.mService.addStateObserver(this);
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        this.reactContext.registerReceiver(discoverReceiver, filter);
+    super(reactContext);
+    this.reactContext = reactContext;
+    context = getReactApplicationContext();
+    this.getBluetoothManagerInstance(context);
+    this.mService = bluetoothService;
+    this.mService.addStateObserver(this);
+    IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+    filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+    this.reactContext.registerReceiver(discoverReceiver, filter);
   }
 
   private void cancelDiscovery() {
-        try {
-          BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
-          if (adapter != null && adapter.isDiscovering()) {
-            adapter.cancelDiscovery();
-          }
-          Log.d(TAG, "Discover canceled");
-        } catch (Exception e) {
-          // ignore
-        }
+    try {
+      BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
+      if (adapter != null && adapter.isDiscovering()) {
+        adapter.cancelDiscovery();
+      }
+      Log.d(TAG, "Discover canceled");
+    } catch (Exception e) {
+      // ignore
+    }
   }
   
   @Override
   public String getName() {
-        return "RNZebraBluetoothPrinter";
+    return "RNZebraBluetoothPrinter";
   }
   
   private void emitRNEvent(String event, @Nullable WritableMap params) {                                                          // emit events to JavaScript        
-        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(event, params);
+    getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(event, params);
   }
 
   @ReactMethod
   public void enableBluetooth(final Promise promise) {
-        try{
-        this.reactContext.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1, null);
-        promise.resolve("enabled");
-        }catch(Exception e) {
-          promise.reject(e);
-        }                                                                                       //enable bluetooth
+    try{
+      this.reactContext.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1, null);
+      promise.resolve("enabled");
+    }catch(Exception e) {
+      promise.reject(e);
+    }                                                                                       //enable bluetooth
   }
 
   @ReactMethod
@@ -384,30 +385,98 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       e.printStackTrace();
     }
   }
-
-  public void disconnect() {
-    try {
-      if (connection != null) {
-        connection.close();
-      }
-
-    } catch (ConnectionException e) {
-      Log.d("Error on disconnect", e.toString());
-    }
-  }
   
   private byte[] getConfigLabel(ZebraPrinter printer, String label) {
     byte[] configLabel = null;
     String printLabel = label;
-    try {
-      SGD.SET("device.languages", "zpl", connection);
 
-      configLabel = printLabel.getBytes();
-     
-    } catch (ConnectionException e) {
-      Log.d("Connection err", e.toString());
-    }
+    PrinterLanguage printerLanguage = printer.getPrinterControlLanguage();
+    
+    Log.d(TAG, "Language: " + printerLanguage.toString());
+    
+    configLabel = printLabel.getBytes();
+
     return configLabel;
+  }
+
+  @ReactMethod
+  public void connect(String device, final Promise promise){
+    try {
+      connection = new BluetoothConnection(device);
+      connection.open();
+      promise.resolve(true);
+    } catch (ConnectionException e) {
+      Log.d(TAG, e.toString());
+      promise.reject("ConnectionException", "nable to establish connection");
+    }
+  }
+
+  @ReactMethod
+  public void disconnect() {
+    try {
+      connection.close();
+    } catch (ConnectionException e) {
+      Log.d(TAG, e.toString());
+    }
+  }
+
+  @ReactMethod
+  public void isConnected(Promise promise){
+    try {
+      promise.resolve(connection.isConnected());
+    } catch (ConnectionException e) {
+      Log.d(TAG, e.toString());
+      promise.resolve(false);
+    } catch (ZebraPrinterLanguageUnknownException e){
+      Log.d(TAG, e.toString());
+      promise.resolve(false);
+    }
+  }
+
+  @ReactMethod
+  public void getPrinterControlLanguage(Promise promise){
+    try {
+      if(!connection.isConnected()){
+        promise.reject("ConnectionException", "Printer does not connected");
+      }
+  
+      ZebraPrinter zebraPrinter = ZebraPrinterFactory.getInstance(connection);
+      
+      PrinterLanguage printerLanguage = zebraPrinter.getPrinterControlLanguage();
+      
+      Log.d(TAG, "Zebra Printer Language: " + printerLanguage.toString());
+  
+      promise.resolve(printerLanguage.toString());
+    } catch (ConnectionException e) {
+      Log.d(TAG, e.toString());
+      promise.reject("ConnectionException", "Printer does not connected");
+    } catch (ZebraPrinterLanguageUnknownException e){
+      Log.d(TAG, e.toString());
+      promise.reject("ZebraPrinterLanguageUnknownException", "Printer Instance does not detected");
+    }
+  }
+
+  @ReactMethod
+  public void fastPrint(String label, final Promise promise){
+    try{
+      if(!connection.isConnected()){
+        promise.reject("ConnectionException", "Printer does not connected");
+      }
+  
+      ZebraPrinter zebraPrinter = ZebraPrinterFactory.getInstance(connection);
+      
+      byte[] labelToPrint = label.getBytes();
+  
+      connection.write(labelToPrint);
+  
+      promise.resolve(true);
+    } catch (ConnectionException e) { 
+      Log.d(TAG, e.toString());
+      promise.reject("ConnectionException", "Printer does not connected");
+    }catch (Exception e) {
+      Log.d(TAG, e.toString());
+      promise.reject("Exception", "FastPrint failed - " + e.toString());
+    }
   }
   
   @ReactMethod
@@ -421,19 +490,21 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       connection.open();
     } catch (ConnectionException e) {
       disconnect();
-      Log.d("Connection err", e.toString());
+      Log.d(TAG, e.toString());
       loading = false;
       success = false;
       promise.reject("Unable to establish connection.Please try again!!!");
     }
     if (connection.isConnected()) {
       try {
-        Log.d("Connection estd", "here");
+        Log.d(TAG, "here");
 
         ZebraPrinter zebraPrinter = ZebraPrinterFactory.getInstance(connection);
         PrinterStatus status = zebraPrinter.getCurrentStatus();
 
         String pl = SGD.GET("device.languages", connection);
+
+        Log.d(TAG, "PL: " + pl);
 
         byte[] configLabel = getConfigLabel(zebraPrinter, label);
         connection.write(configLabel);
@@ -445,7 +516,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       } catch (Exception err) {
         success = false;
         loading = false;
-        Log.d("Connection err", err.toString());
+        Log.d(TAG, err.toString());
         promise.reject(err.toString());
       } finally {
         disconnect();
