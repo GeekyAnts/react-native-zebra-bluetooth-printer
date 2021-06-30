@@ -184,23 +184,23 @@ You can control the start and end of the connection for faster printing. For thi
 ...
 
 useEffect(() => {
-	const connectPrinter = async (device) => {
-		await RNZebraBluetoothPrinter.connect(device.address);
-	}
+  const connectPrinter = async (device) => {
+    await RNZebraBluetoothPrinter.connect(device.address);
+  }
 
-	if(device){
-		connectPrinter(device);
-	}
+  if(device){
+    connectPrinter(device);
+  }
 
-	return () => RNZebraBluetoothPrinter.disconnect();
+  return () => RNZebraBluetoothPrinter.disconnect();
 }, [device])
 
 ...
 
 const printTags = async (quantity) => {
-	for(let i=0; i<quantity; i++){
-		await RNZebraBluetoothPrinter.fastPrint("...");
-	}
+  for(let i=0; i<quantity; i++){
+    await RNZebraBluetoothPrinter.fastPrint("...");
+  }
 }
 
 ...
