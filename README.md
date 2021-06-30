@@ -178,6 +178,7 @@ await RNZebraBluetoothPrinter.print(tags[printerLanguage]);
 You can control the start and end of the connection for faster printing. For this to work, you need to open the connection at the beginning of your code, and close it only at the end of the whole process. An example would be:
 
 - I open the connection when starting the screen, print all the labels that are requested, and finally close the connection.
+- The fastPrint function will print to the connected printer.
 
 ```javascript
 ...
@@ -198,7 +199,7 @@ useEffect(() => {
 
 const printTags = async (quantity) => {
 	for(let i=0; i<quantity; i++){
-		await RNZebraBluetoothPrinter.print("...");
+		await RNZebraBluetoothPrinter.fastPrint("...");
 	}
 }
 
