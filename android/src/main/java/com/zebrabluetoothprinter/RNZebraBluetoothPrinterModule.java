@@ -187,91 +187,90 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   }
 
   @Override
-    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
-        Log.d(TAG, "onActivityResult " + resultCode);
-        switch (requestCode) {
-            case REQUEST_CONNECT_DEVICE: {
-                // When DeviceListActivity returns with a device to connect
-                if (resultCode == Activity.RESULT_OK) {
-                    // Get the device MAC address
-                    String address = data.getExtras().getString(
-                            EXTRA_DEVICE_ADDRESS);
-                    // Get the BLuetoothDevice object
-                    if (adapter!=null && BluetoothAdapter.checkBluetoothAddress(address)) {
-                        BluetoothDevice device = adapter
-                                .getRemoteDevice(address);
-                        // Attempt to connect to the device
-                        mService.connect(device);
-                    }
-                }
-                break;
-            }
-            case REQUEST_ENABLE_BT: {
-                Promise promise = promiseMap.remove(PROMISE_ENABLE_BT);
-                // When the request to enable Bluetooth returns
-                if (resultCode == Activity.RESULT_OK && promise != null) {
-                    // Bluetooth is now enabled, so set up a session
-                    if(adapter!=null){
-                        WritableArray pairedDeivce =Arguments.createArray();
-                        Set<BluetoothDevice> boundDevices = adapter.getBondedDevices();
-                        for (BluetoothDevice d : boundDevices) {
-                            try {
-                                JSONObject obj = new JSONObject();
-                                obj.put("name", d.getName());
-                                obj.put("address", d.getAddress());
-                                pairedDeivce.pushString(obj.toString());
-                            } catch (Exception e) {
-                                //ignore.
-                            }
-                        }
-                        promise.resolve(pairedDeivce);
-                    }else{
-                        promise.resolve(null);
-                    }
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+      BluetoothAdapter adapter = this.bluetoothManager.getAdapter();
+      Log.d(TAG, "onActivityResult " + resultCode);
+      switch (requestCode) {
+          case REQUEST_CONNECT_DEVICE: {
+              // When DeviceListActivity returns with a device to connect
+              if (resultCode == Activity.RESULT_OK) {
+                  // Get the device MAC address
+                  String address = data.getExtras().getString(
+                          EXTRA_DEVICE_ADDRESS);
+                  // Get the BLuetoothDevice object
+                  if (adapter!=null && BluetoothAdapter.checkBluetoothAddress(address)) {
+                      BluetoothDevice device = adapter
+                              .getRemoteDevice(address);
+                      // Attempt to connect to the device
+                      mService.connect(device);
+                  }
+              }
+              break;
+          }
+          case REQUEST_ENABLE_BT: {
+              Promise promise = promiseMap.remove(PROMISE_ENABLE_BT);
+              // When the request to enable Bluetooth returns
+              if (resultCode == Activity.RESULT_OK && promise != null) {
+                  // Bluetooth is now enabled, so set up a session
+                  if(adapter!=null){
+                      WritableArray pairedDeivce =Arguments.createArray();
+                      Set<BluetoothDevice> boundDevices = adapter.getBondedDevices();
+                      for (BluetoothDevice d : boundDevices) {
+                          try {
+                              JSONObject obj = new JSONObject();
+                              obj.put("name", d.getName());
+                              obj.put("address", d.getAddress());
+                              pairedDeivce.pushString(obj.toString());
+                          } catch (Exception e) {
+                              //ignore.
+                          }
+                      }
+                      promise.resolve(pairedDeivce);
+                  }else{
+                      promise.resolve(null);
+                  }
 
-                } else {
-                    // User did not enable Bluetooth or an error occured
-                    Log.d(TAG, "BT not enabled");
-                    if (promise != null) {
-                        promise.reject("ERR", new Exception("BT NOT ENABLED"));
-                    }
-                }
-                break;
-            }
-        }
-    }
+              } else {
+                  // User did not enable Bluetooth or an error occured
+                  Log.d(TAG, "BT not enabled");
+                  if (promise != null) {
+                      promise.reject("ERR", new Exception("BT NOT ENABLED"));
+                  }
+              }
+              break;
+          }
+      }
+  }
 
   @Override
-  public void onNewIntent(Intent intent) {
-
-  }
+  public void onNewIntent(Intent intent) {}
 
   @ReactMethod
   public void pairedDevices(final Promise promise) {
-    this.context = getCurrentActivity();
     if( bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-      promise.reject("BT NOT ENABLED");
-    }
-    else {
-          Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-            List<String> deviceName = new ArrayList<String>();
-            List<String> deviceAddress = new ArrayList<String>();
-            List<Integer> ble = new ArrayList<Integer>();
-          try {
-        WritableArray app_list = new WritableNativeArray();
-        for (BluetoothDevice bt : pairedDevices) {
-          BluetoothClass bluetoothClass = bt.getBluetoothClass();    // get class of bluetooth device
-        WritableMap info = new WritableNativeMap();
-            info.putString("address", bt.getAddress());
-                info.putDouble("class", bluetoothClass.getDeviceClass()); //1664
-                info.putString("name",bt.getName());
-                info.putString("type","paired");
-                 app_list.pushMap(info);
+      promise.reject("BluetoothException", "Bluetooth not available");
+    } else {
+      Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+
+      try {
+        WritableArray devices = new WritableNativeArray();
+        
+        for (BluetoothDevice device : pairedDevices) {
+          BluetoothClass class = device.getBluetoothClass();
+          
+          WritableMap info = new WritableNativeMap();
+
+          info.putString("address", device.getAddress());
+          info.putDouble("class", class.getDeviceClass()); //1664
+          info.putString("name", device.getName());
+          info.putString("type","paired");
+          
+          devices.pushMap(info);
         }
-      promise.resolve(app_list);
+        
+        promise.resolve(devices);
       } catch (Exception e) {
-        promise.reject(E_LAYOUT_ERROR, e);
+        promise.reject("Exception", e);
       }
      
     }
@@ -289,6 +288,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
         promise.reject("bluetooth not enabled");
       }
   }
+
   private void unpair(BluetoothDevice device) {
     try {
       Method m = device.getClass().getMethod("removeBond",(Class []) null);
@@ -517,48 +517,51 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     }
 
   }
+
   @Override
-    public void onBluetoothServiceStateChanged(int state, Map<String, Object> bundle) {
-        Log.d(TAG,"on bluetoothServiceStatChange:"+state);
-        switch (state) {
-            case BluetoothService.STATE_CONNECTED:
-            case MESSAGE_DEVICE_NAME: {
-                // save the connected device's name
-                mConnectedDeviceName = (String) bundle.get(DEVICE_NAME);
-                Promise p = promiseMap.remove(PROMISE_CONNECT);
-                if (p == null) {   Log.d(TAG,"No Promise found.");
-                    WritableMap params = Arguments.createMap();
-                    params.putString(DEVICE_NAME, mConnectedDeviceName);
-                    emitRNEvent(EVENT_CONNECTED, params);
-                } else { Log.d(TAG,"Promise Resolve.");
-                    p.resolve(mConnectedDeviceName);
-                }
+  public void onBluetoothServiceStateChanged(int state, Map<String, Object> bundle) {
+      Log.d(TAG,"on bluetoothServiceStatChange:"+state);
+      switch (state) {
+          case BluetoothService.STATE_CONNECTED:
+          case MESSAGE_DEVICE_NAME: {
+              // save the connected device's name
+              mConnectedDeviceName = (String) bundle.get(DEVICE_NAME);
+              Promise p = promiseMap.remove(PROMISE_CONNECT);
+              if (p == null) {   Log.d(TAG,"No Promise found.");
+                  WritableMap params = Arguments.createMap();
+                  params.putString(DEVICE_NAME, mConnectedDeviceName);
+                  emitRNEvent(EVENT_CONNECTED, params);
+              } else { Log.d(TAG,"Promise Resolve.");
+                  p.resolve(mConnectedDeviceName);
+              }
 
-                break;
-            }
-            case MESSAGE_CONNECTION_LOST: {
-                //Connection lost should not be the connect result.
-               // Promise p = promiseMap.remove(PROMISE_CONNECT);
-               // if (p == null) {
-                    emitRNEvent(EVENT_CONNECTION_LOST, null);
-               // } else {
-                 //   p.reject("Device connection was lost");
-                //}
-                break;
-            }
-            case MESSAGE_UNABLE_CONNECT: {     //无法连接设备
-                Promise p = promiseMap.remove(PROMISE_CONNECT);
-                if (p == null) {
-                    emitRNEvent(EVENT_UNABLE_CONNECT, null);
-                } else {
-                    p.reject("Unable to connect device");
-                }
+              break;
+          }
+          case MESSAGE_CONNECTION_LOST: {
+              //Connection lost should not be the connect result.
+              // Promise p = promiseMap.remove(PROMISE_CONNECT);
+              // if (p == null) {
+                  emitRNEvent(EVENT_CONNECTION_LOST, null);
+              // } else {
+                //   p.reject("Device connection was lost");
+              //}
+              break;
+          }
+          case MESSAGE_UNABLE_CONNECT: {     //无法连接设备
+              Promise p = promiseMap.remove(PROMISE_CONNECT);
+              if (p == null) {
+                  emitRNEvent(EVENT_UNABLE_CONNECT, null);
+              } else {
+                  p.reject("Unable to connect device");
+              }
 
-                break;
-            }
-            default:
-                break;
-        }
+              break;
+          }
+          default:
+              break;
       }
-  
     }
+
+  }
+
+}
