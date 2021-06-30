@@ -122,7 +122,8 @@ RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((res) => {
 
     iOS: function resolves to nil.
 
-8. print == > async function, prints specific zpl string from a zebra printer for both android and iOS. CPCL strings can also be printed using this for Android.
+8. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.
+   For example :
 
 ```javascript
 const zpl =
@@ -143,64 +144,4 @@ iOS
 RNZebraBluetoothPrinter.print(zpl).then((res) => {
   //do something with res
 });
-```
-
-9. isConnected == > async function, returns a boolean value to indicate whether or not there is an open connection.
-   For example :
-
-Android
-
-```javascript
-const isConnected = await RNZebraBluetoothPrinter.isConnected();
-```
-
-10. getPrinterControlLanguage == > async function, returns a String containing the connected printer language.
-    For example :
-
-Android
-
-```javascript
-const tags = {
-  ZPL: "...",
-  CPCL: "...",
-  PDF: "...",
-};
-
-const printerLanguage =
-  await RNZebraBluetoothPrinter.getPrinterControlLanguage();
-
-await RNZebraBluetoothPrinter.print(tags[printerLanguage]);
-```
-
-### Fast Print - [Android only]
-
-You can control the start and end of the connection for faster printing. For this to work, you need to open the connection at the beginning of your code, and close it only at the end of the whole process. An example would be:
-
-- I open the connection when starting the screen, print all the labels that are requested, and finally close the connection.
-- The fastPrint function will print to the connected printer.
-
-```javascript
-...
-
-useEffect(() => {
-  const connectPrinter = async (device) => {
-    await RNZebraBluetoothPrinter.connect(device.address);
-  }
-
-  if(device){
-    connectPrinter(device);
-  }
-
-  return () => RNZebraBluetoothPrinter.disconnect();
-}, [device])
-
-...
-
-const printTags = async (quantity) => {
-  for(let i=0; i<quantity; i++){
-    await RNZebraBluetoothPrinter.fastPrint("...");
-  }
-}
-
-...
 ```
