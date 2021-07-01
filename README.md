@@ -113,11 +113,15 @@ RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((res) => {
 For example :
 ```javascript
 const zpl = "^XA^FX Top section with company logo, name and address.^CF0,60^FO50,50^GB100,100,100^FS^ FO75,75 ^ FR ^ GB100, 100, 100 ^ FS^ FO88, 88 ^ GB50, 50, 50 ^ FS ^XZ";
+const zplArray = ["^XA^CFA,30^FO30,30^FDPage one^FS^XZ", "^XA^CFA,30^FO30,30^FDPage two^FS^XZ", "^XA^CFA,30^FO30,30^FDPage three^FS^XZ"];
 
 ```
 Android
 ```javascript
 RNZebraBluetoothPrinter.print(deviceAddress,zpl).then((res) => {
+	//do something with res
+})
+RNZebraBluetoothPrinter.printBulk(deviceAddress,zplArray).then((res) => {
 	//do something with res
 })
 ```
