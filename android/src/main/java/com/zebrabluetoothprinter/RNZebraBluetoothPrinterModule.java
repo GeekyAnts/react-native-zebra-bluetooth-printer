@@ -414,7 +414,6 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public void print(String device, String label,final Promise promise) {            //print functionality for zebra printer
     boolean success = false;
     boolean loading = false;
-    sleep(500);
     connection = new BluetoothConnection(device);
     try {
       loading = true;
@@ -437,7 +436,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
 
         byte[] configLabel = getConfigLabel(zebraPrinter, label);
         connection.write(configLabel);
-        sleep(1500);
+        sleep(200);
         success = true;
         loading = false;
        promise.resolve(success);
